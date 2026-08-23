@@ -39,7 +39,8 @@ def load_cached(key: str, cache_dir: Path = CACHE_DIR) -> PredictionResult | Non
                             tuning_results=tuning, best_params=meta["best_params"], train_size=meta["train_size"])
 
 
-def save_cached(key: str, pred: PredictionResult, spec: RunSpec, dataset: Dataset, cache_dir: Path = CACHE_DIR) -> None:
+def save_cached(key: str, pred: PredictionResult, spec: RunSpec, dataset: Dataset, cache_dir: Path = CACHE_DIR,
+                seconds: float | None = None) -> None:
     p = _cache_paths(key, cache_dir)
     p["dir"].mkdir(parents=True, exist_ok=True)
     pred.y_pred.to_parquet(p["y_pred"])
@@ -53,7 +54,8 @@ def save_cached(key: str, pred: PredictionResult, spec: RunSpec, dataset: Datase
     p["meta"].write_text(json.dumps({"spec": {**asdict(spec), "tuning": asdict(spec.tuning)},
                                      "best_params": pred.best_params, "train_size": pred.train_size,
                                      "data_fingerprint": dataset.fingerprint(),
-                                     "created": time.strftime("%Y-%m-%dT%H:%M:%S")}, indent=1, default=str))
+                                     "seconds": None if seconds is None else round(seconds, 1),
+                                     "created": time.strftime("%Y-%m-%dT%H:%M:%S%z")}, indent=1, default=str))
 
 
 # ------------------------------------------------------------------------------------------ exécution
@@ -74,9 +76,10 @@ def get_predictions(spec: RunSpec, dataset: Dataset, cache_dir: Path = CACHE_DIR
     series = dataset.returns_monthly
     if spec.family == "classifier":
         series = binarize(series)
+    t0 = time.perf_counter()
     pred = predict(spec.model, series, dataset.exog_monthly, spec.cutoff, spec.tuning, n_jobs=n_jobs)
     if use_cache:
-        save_cached(key, pred, spec, dataset, cache_dir)
+        save_cached(key, pred, spec, dataset, cache_dir, seconds=time.perf_counter() - t0)
     return pred
 
 

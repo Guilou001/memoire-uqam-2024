@@ -87,6 +87,32 @@ classement des prévisions ; la jambe « short » tenue longue fait aussi bien q
 Canada). Un seul modèle garde un vrai alpha long-short dans ce tableau, Extra Trees aux États-Unis.
 Scripts : `scripts/compare_long_short_modes.py` ; tables : `results/tables/long_short_modes_*.csv`.
 
+### Les huit modèles, top 10, version 2 (mesuré le 2026-08-23, `results/v2/metrics.csv`)
+
+TCAC en années civiles, brut de coûts, 2008-01 → 2024-01. « Publié » : mode `as_published` de la v2, qui reproduit le code de
+2024 (short additionné, rééquilibrages sautés les 1ers non ouvrés) ; « corrigé » : short soustrait et rééquilibrage au premier
+jour de bourse suivant. Volet États-Unis sur les prix bruts de 2024 ; volet Canada sur les prix retéléchargés en 2026. Les écarts avec le tableau
+précédent (Ridge corrigé −0,7 % → −0,9 % aux États-Unis, −8,6 % → −7,5 % au Canada) viennent du rééquilibrage au jour
+ouvré suivant et, pour le Canada, des prix retéléchargés.
+
+| Modèle | É.-U. TCAC publié | É.-U. TCAC corrigé | É.-U. Sharpe publié | É.-U. Sharpe corrigé | Canada TCAC publié | Canada TCAC corrigé | Canada Sharpe publié | Canada Sharpe corrigé |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ridge (rég.) | 19,3 % | −0,9 % | 0,64 | 0,00 | 28,7 % | −7,5 % | 0,90 | −0,35 |
+| XGBoost (rég.) | 19,3 % | −0,6 % | 0,65 | 0,02 | 23,4 % | −1,3 % | 0,77 | 0,02 |
+| AdaBoost (rég.) | 17,5 % | 0,4 % | 0,60 | 0,10 | 24,8 % | −0,5 % | 0,80 | 0,07 |
+| Extra Trees (rég.) | 21,8 % | 6,9 % | 0,71 | 0,76 | 21,6 % | −2,3 % | 0,71 | −0,07 |
+| Logistique (class.) | 21,7 % | 6,7 % | 0,71 | 0,72 | 18,8 % | −2,0 % | 0,66 | −0,05 |
+| XGBoost (class.) | 21,2 % | 4,9 % | 0,70 | 0,52 | 22,6 % | 1,1 % | 0,75 | 0,15 |
+| Hist. gradient boosting (class.) | 20,3 % | 7,4 % | 0,68 | 0,80 | 20,9 % | −3,2 % | 0,69 | −0,12 |
+| Extra Trees (class.) | 21,5 % | 5,6 % | 0,71 | 0,63 | 21,7 % | −2,2 % | 0,72 | −0,06 |
+
+Repères sur la même période : S&P 500 TCAC 11,5 %, Sharpe 0,59 ; équipondéré des 50 titres
+américains 11,1 %, Sharpe 0,66 ; composite TSX 2,6 %, Sharpe 0,24 ; équipondéré des 49 titres
+canadiens 11,5 %, Sharpe 0,79. Lecture : une fois le short réellement soustrait, aucun modèle canadien ne
+dépasse 1,1 % de TCAC ; aux États-Unis, six modèles restent positifs (AdaBoost à 0,4 % ; Extra Trees régresseur et
+classifieur, Logistique, XGBoost classifieur et Hist. gradient boosting entre 4,9 % et 7,4 %), tous sous l'équipondéré et
+sous l'indice. Les 96 exécutions (3 signaux × 2 modes) sont dans `results/v2/`.
+
 ## 4. Arborescence
 
 ```

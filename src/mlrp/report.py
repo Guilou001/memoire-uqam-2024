@@ -46,7 +46,13 @@ def comparison_table(metrics: pd.DataFrame, country: str, period: str, signal: s
                                               "Gross_Exposure", "r2_oos_average")) -> pd.DataFrame:
     """Table modèles x modes (as_published contre corrected) pour un pays, une période, un signal."""
     sub = metrics[(metrics["country"] == country) & (metrics["period"] == period) & (metrics["signal"] == signal)]
-    return sub.pivot_table(index="model", columns="mode", values=[c for c in cols if c in sub.columns])
+    present = [c for c in cols if c in sub.columns]
+    table = sub.pivot_table(index="model", columns="mode", values=present)
+    # colonnes plates et dans l'ordre demandé : « CAGR (as_published) », « CAGR (corrected) », …
+    modes = [m for m in ("as_published", "corrected") if m in sub["mode"].unique()]
+    table = table.reindex(columns=pd.MultiIndex.from_product([present, modes]))
+    table.columns = [f"{metric} ({mode})" for metric, mode in table.columns]
+    return table
 
 
 def write_markdown_table(df: pd.DataFrame, out: Path, floatfmt: str = ".3f") -> Path:
@@ -62,12 +68,14 @@ def write_markdown_table(df: pd.DataFrame, out: Path, floatfmt: str = ".3f") -> 
 def figures_for_period(returns_dir: Path, country: str, period: str, out_dir: Path = RESULTS_DIR / "figures") -> list[Path]:
     """Une figure par mode : tous les modèles d'un pays et d'une période (signal top10 si présent)."""
     made = []
+    labels = {"usa": "États-Unis", "canada": "Canada"}
+    mode_labels = {"corrected": "long-short corrigé (short soustrait)", "as_published": "tel que publié (deux jambes longues)"}
     for mode in ("corrected", "as_published"):
         series = {}
         for f in sorted((returns_dir / country / period).glob(f"*_top10_{mode}.csv.gz")):
             name = f.name.replace(f"_top10_{mode}.csv.gz", "")
             series[name] = pd.read_csv(f, index_col=0, parse_dates=True).iloc[:, 0]
         if series:
-            made.append(cumulative_plot(series, f"{country} {period} top 10, mode {mode}",
-                                        out_dir / country / f"{period}_top10_{mode}"))
+            title = f"{labels.get(country, country)}, {period}, top 10, {mode_labels[mode]}, brut de coûts"
+            made.append(cumulative_plot(series, title, out_dir / country / f"{period}_top10_{mode}"))
     return made

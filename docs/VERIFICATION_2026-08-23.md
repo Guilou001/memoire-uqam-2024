@@ -60,3 +60,10 @@ somme telle que publiée 19,35 % ; vrai long-short (long − short) −0,60 %. T
 - Les résultats Ada Boost régression du mémoire n'existent dans l'archive qu'en HTML et en pickle (pas de `y_pred`,
   pas de `key_metrics`).
 - `transaction_fee` vaut 0 dans la configuration finale : tous les résultats sont bruts de coûts.
+
+## Addendum du 2026-08-23 (soir) : version 2
+
+La refonte `mlrp` (voir `V2_ARCHITECTURE.md`) reproduit les prédictions et rendements de 2024 (Ridge US : 2,8 × 10⁻⁷ et
+1,2 × 10⁻¹⁶) et a permis de recalculer les huit modèles, trois signaux et deux modes de long-short sur 2008-2024 en une
+exécution de 2 h 40 (`results/v2/metrics.csv`). Elle a révélé un troisième comportement du code de 2024 : les
+rééquilibrages dont le 1er du mois n'est pas un jour de bourse sont sautés. Tableau des huit modèles : README, section 3.

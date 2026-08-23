@@ -42,6 +42,19 @@ sous le capot). Réécrire en Rust ou C++ n'apporterait rien là où le temps pa
 prédictions, du parallélisme par processus et de la vectorisation de la partie portefeuille. C'est un choix
 délibéré (P).
 
+Exécution complète mesurée le 2026-08-23 (`mlrp run --country both --period 2008-2024 --models thesis --signals all
+--modes corrected,as_published --jobs 8`, Apple M2, 16 jeux dont 1 déjà en cache) : 9 578 s de mur, soit 2 h 40, pour
+15 jeux de prédictions et 96 portefeuilles. Ordre d'achèvement depuis le lancement : Ridge Canada 4 min, Logistique
+Canada 7 min, XGBoost régresseur 12 à 19 min, Logistique États-Unis 24 min, XGBoost classifieur et Hist. gradient
+boosting Canada 37 min, Extra Trees classifieur Canada 43 min, Hist. gradient boosting États-Unis 57 min, Extra Trees
+États-Unis 64 à 66 min, AdaBoost États-Unis 105 min, Extra Trees régresseur Canada 148 min, AdaBoost Canada 158 min
+(horodatages `created` du cache ; 8 processus en concurrence, donc des durées par modèle surestimées par rapport à
+une exécution isolée ; les prochains jeux portent un champ `seconds`). Le code de 2024 aurait fait 48 exécutions
+complètes en série, chacune avec sa propre recherche d'hyperparamètres. Le journal contient des
+`ChildProcessError: [Errno 10] No child processes` émis par `multiprocessing.resource_tracker` à l'arrêt des
+processus loky sous Python 3.12 : message de fin de vie, sans effet sur les résultats (96 lignes écrites, code de
+sortie 0).
+
 ## 4. Équivalence avec le code de 2024 (M)
 
 `scripts/check_v2_equivalence.py` (Ridge, États-Unis, top 10, 2008-2024, données brutes de 2024) : mêmes
