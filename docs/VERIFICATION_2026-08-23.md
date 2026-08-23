@@ -67,3 +67,10 @@ La refonte `mlrp` (voir `V2_ARCHITECTURE.md`) reproduit les prédictions et rend
 1,2 × 10⁻¹⁶) et a permis de recalculer les huit modèles, trois signaux et deux modes de long-short sur 2008-2024 en une
 exécution de 2 h 40 (`results/v2/metrics.csv`). Elle a révélé un troisième comportement du code de 2024 : les
 rééquilibrages dont le 1er du mois n'est pas un jour de bourse sont sautés. Tableau des huit modèles : README, section 3.
+
+## Addendum du 2026-08-23 (nuit) : revue ligne à ligne de la v2
+
+Revue indépendante avec recalculs (détail dans `V2_ARCHITECTURE.md`, section 5 bis) : implémentation confirmée
+exacte ; quatrième biais méthodologique identifié et mesuré, hérité de 2024 : exogènes macro un mois en avance
+sur le rendement prédit (Ridge US top 10 en alignement temps réel : TCAC corrigé −0,9 % → −3,3 %, R² moyen
+−0,40 → −0,46, `scripts/check_exog_alignment.py`). Ajouté à la table des limites du README.

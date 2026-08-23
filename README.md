@@ -101,7 +101,7 @@ Scripts : `scripts/compare_long_short_modes.py` ; tables : `results/tables/long_
 
 ![Importance SHAP des variables macro, Extra Trees, États-Unis, top 10](results/figures/usa/2008-01%20%C3%A0%202024-01/Top%2010/summary_plot_extra_trees_regressor.png)
 
-*Importance des variables par SHAP (sortie archivée de 2024) : base monétaire (BOGMBASE), taux de change, emploi manufacturier et production industrielle dominent pour l'Extra Trees américain. Les figures SHAP des autres modèles, pays et périodes sont dans `results/figures/<pays>/<période>/<signal>/` (`summary_plot_*.png` pour l'essaim, `bar_plot_*.png` pour le classement moyen).*
+*Importance des variables par SHAP (sortie archivée de 2024) : base monétaire (BOGMBASE), taux de change, emploi manufacturier et production industrielle dominent pour l'Extra Trees américain. Les figures SHAP des autres modèles, pays et périodes sont dans `results/figures/<pays>/<période>/<signal>/` (`summary_plot_*.png` pour l'essaim, `bar_plot_*.png` pour le classement moyen). Une exception héritée de 2024 : les fichiers `summary_plot_extra_trees_classifier.png` sont dégénérés (interactions SHAP sur les deux seuls retards, valeurs à zéro) ; les essaims des autres classifieurs, eux, sont complets.*
 
 ### Les huit modèles, top 10, version 2 (mesuré le 2026-08-23, `results/v2/metrics.csv`)
 
@@ -193,6 +193,7 @@ Canada, faute du fichier de prix de 2024 dans l'archive ; les prix ajustés ret�
 | Hyperparamètres choisis sur la période de test (fuite de sélection) | reconnu ; à corriger par validation purgée dans `memoire-2.0` |
 | Univers figé de titres survivants (biais de survie), FNB XIU.TO dans l'univers, 49 titres au lieu de 50 | reconnu ; univers point-in-time prévu dans `memoire-2.0` |
 | Coûts de transaction à zéro, poids égaux, rééquilibrage mensuel | reconnu ; paramètre `--fee` disponible, non utilisé dans le mémoire |
+| Exogènes macro alignées un mois en avance : le rendement du mois M est prédit avec la macro du mois M+1, publiée en M+2 (convention d'alignement du code de 2024, revue du 2026-08-23) | mesuré sur Ridge US top 10 avec réoptimisation : en alignement temps réel (macro M-1), TCAC corrigé −0,9 % → −3,3 %, R² moyen −0,40 → −0,46 (`scripts/check_exog_alignment.py`) ; alignement d'origine conservé dans v1 et v2 pour la fidélité au mémoire, correction prévue dans `memoire-2.0` |
 | Données macro en millésime final (révisions non simulées) | reconnu |
 | Prix Yahoo ajustés révisés dans le temps (volet Canada non identique) | mesuré (corrélation 0,96 des prévisions) |
 

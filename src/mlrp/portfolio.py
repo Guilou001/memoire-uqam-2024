@@ -131,8 +131,13 @@ class StrategyResult:
 
 def strategy_returns(long_target: pd.DataFrame, short_target: pd.DataFrame | None, prices_daily: pd.DataFrame,
                      mode: str = "corrected", fee: float = 0.0) -> StrategyResult:
-    """Rendements quotidiens d'un portefeuille rééquilibré aux dates des poids cibles."""
-    daily = prices_daily.pct_change().iloc[1:]
+    """Rendements quotidiens d'un portefeuille rééquilibré aux dates des poids cibles.
+
+    Les prix manquants sont reportés (``ffill``) avant le calcul des rendements : convention du code de 2024
+    (un jour sans cotation donne un rendement nul, un titre radié reste à plat dans le portefeuille au lieu
+    d'en sortir). Rendu explicite pour survivre aux changements de défaut de ``pct_change`` dans pandas 3.
+    """
+    daily = prices_daily.ffill().pct_change(fill_method=None).iloc[1:]
     long_only = short_target is None
     sign = 1.0 if (mode == "corrected" or long_only) else -1.0
     alignment = "legacy" if mode == "as_published" else "next_trading_day"
@@ -145,9 +150,10 @@ def strategy_returns(long_target: pd.DataFrame, short_target: pd.DataFrame | Non
         short_leg = (ws.shift(1) * r).sum(axis=1)
         ret = ret - short_leg if mode == "corrected" else ret + short_leg
 
-    # rotation aux jours de rééquilibrage effectifs : poids appliqués contre poids dérivés de la veille
-    pos, _ = rebalance_positions(long_target.loc[wl.index[0]:].index, wl.index, alignment) \
-        if long_target.index.min() >= wl.index[0] else rebalance_positions(long_target.index, wl.index, alignment)
+    # rotation aux jours de rééquilibrage effectifs : poids appliqués contre poids dérivés de la veille.
+    # L'index complet des cibles est utilisé : une cible antérieure au premier jour de bourse (1er tombant un
+    # week-end) est rattachée au premier jour, comme dans la dérive ; sa rotation de mise en place est forcée à 0.
+    pos, _ = rebalance_positions(long_target.index, wl.index, alignment)
     rebal = wl.index[pos]
     turn = (wl.loc[rebal] - wl.shift(1).loc[rebal].fillna(0.0)).abs().sum(axis=1)
     if ws is not None:

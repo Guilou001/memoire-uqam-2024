@@ -124,8 +124,10 @@ def r2_oos_by_level(y_true: pd.DataFrame, y_pred: pd.DataFrame, y_train: pd.Data
     for col in y_pred.columns:
         out[col] = r_squared_modified(y_true[col].loc[y_pred.index], y_pred[col], y_train[col])
     s = pd.Series(out)
-    pooled = r_squared_modified(y_true.loc[y_pred.index, y_pred.columns].values.ravel(), y_pred.values.ravel(),
-                                y_train[y_pred.columns].values.ravel())
+    yt = y_true.loc[y_pred.index, y_pred.columns].values.ravel()
+    yp = y_pred.values.ravel()
+    ok = ~(np.isnan(yt) | np.isnan(yp))  # sans ce masque, un seul NaN rendait le « pooling » NaN
+    pooled = r_squared_modified(yt[ok], yp[ok], y_train[y_pred.columns].values.ravel())
     s.loc["average"] = float(s.mean())
     s.loc["pooling"] = float(pooled)
     return s

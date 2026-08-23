@@ -77,6 +77,25 @@ celles de 2024 (`tests/test_v2_metrics.py`) ; 31 tests, sans réseau.
 S'ajoutent aux constats du journal de vérification : jambe « short » additionnée, TCAC sous-estimé par quantstats,
 hyperparamètres choisis sur la période de test, 49 titres canadiens.
 
+## 5 bis. Revue du 2026-08-23 : un troisième constat et des correctifs
+
+Une relecture ligne à ligne (avec recalculs indépendants : Pesaran-Timmermann identique au papier de 1992 à
+4,9 × 10⁻¹⁵, dérive identique à une boucle naïve à 6 × 10⁻¹⁸, métriques à 10⁻¹²) a établi un constat
+méthodologique supplémentaire, hérité de 2024 : les exogènes macro sont alignées sur le tampon du rendement
+prédit, or FRED-MD tamponne chaque ligne au mois couvert. Le rendement du mois M (tamponné en fin de mois M)
+est donc prédit avec la macro du mois M+1, publiée en M+2. Impact mesuré (Ridge États-Unis, top 10, 2008-2024,
+recherche d'hyperparamètres refaite) : en alignement temps réel (macro du mois M-1), le TCAC corrigé passe de
+−0,9 % à −3,3 %, le Sharpe de 0,00 à −0,18, le R² moyen de −0,40 à −0,46 ; le mode « tel que publié » passe de
+19,3 % à 21,8 %. L'ordre de grandeur des conclusions ne change pas, le biais est déclaré dans le README
+(section 6) et l'alignement d'origine est conservé pour la fidélité au mémoire ; `memoire-2.0` le corrigera.
+
+Correctifs appliqués à la suite de la revue : invalidation du cache de prédictions quand l'empreinte des
+données change (l'empreinte était écrite mais jamais relue), rotation moyenne calculée hors rééquilibrage de
+mise en place, « pooling » du R² robuste aux NaN, filtres d'avertissements ciblés au lieu d'un ignore global,
+`ffill` explicite avant `pct_change` (comportement de 2024 figé face à pandas 3, et documenté : un titre radié
+reste à plat au lieu de sortir). Constats conservés tels quels et documentés : jambe short au seuil global de
+rangs (sans effet avec un univers constant), départage alphabétique du top 10 des classifieurs (hérité de 2024).
+
 ## 6. Ce que la v2 ne change pas (encore)
 
 La sélection des hyperparamètres sur la période de test, l'univers figé de titres survivants, l'absence de

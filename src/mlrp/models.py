@@ -18,7 +18,10 @@ import pandas as pd
 from mlrp.config import TuningSpec, load_model_space, model_family
 from mlrp.metrics import FAMILY_METRICS, METRICS
 
-warnings.filterwarnings("ignore")
+# Filtres ciblés (jamais un « ignore » global : il masquerait aussi les avertissements utiles ailleurs).
+warnings.filterwarnings("ignore", message=".*forecaster will be fit.*")  # LongTrainingWarning de skforecast
+warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn")
+warnings.filterwarnings("ignore", category=FutureWarning, module="skforecast")
 
 _ESTIMATOR_PATHS = {
     "ridge_regressor": "sklearn.linear_model:Ridge",

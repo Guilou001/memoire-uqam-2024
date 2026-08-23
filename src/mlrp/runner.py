@@ -29,11 +29,14 @@ def _cache_paths(key: str, cache_dir: Path) -> dict[str, Path]:
             "tuning": d / "tuning_results.parquet", "meta": d / "meta.json"}
 
 
-def load_cached(key: str, cache_dir: Path = CACHE_DIR) -> PredictionResult | None:
+def load_cached(key: str, cache_dir: Path = CACHE_DIR,
+                expected_fingerprint: str | None = None) -> PredictionResult | None:
     p = _cache_paths(key, cache_dir)
     if not p["y_pred"].exists() or not p["meta"].exists():
         return None
     meta = json.loads(p["meta"].read_text())
+    if expected_fingerprint is not None and meta.get("data_fingerprint") != expected_fingerprint:
+        return None  # les données brutes ont changé depuis la mise en cache : prédictions périmées, on recalcule
     tuning = pd.read_parquet(p["tuning"]) if p["tuning"].exists() else None
     return PredictionResult(y_pred=pd.read_parquet(p["y_pred"]), metrics_levels=pd.read_parquet(p["levels"]),
                             tuning_results=tuning, best_params=meta["best_params"], train_size=meta["train_size"])
@@ -70,7 +73,7 @@ def get_predictions(spec: RunSpec, dataset: Dataset, cache_dir: Path = CACHE_DIR
                     use_cache: bool = True) -> PredictionResult:
     key = spec.prediction_key()
     if use_cache:
-        cached = load_cached(key, cache_dir)
+        cached = load_cached(key, cache_dir, expected_fingerprint=dataset.fingerprint())
         if cached is not None:
             return cached
     series = dataset.returns_monthly
@@ -104,7 +107,8 @@ def run(spec: RunSpec, raw_dir: Path = RAW_DIR, cache_dir: Path = CACHE_DIR, n_j
     strat = strategy_returns(long_w, short_w, ds.prices_daily, mode=spec.long_short_mode, fee=spec.fee)
     perf = performance_table(strat.returns, spec.model)
     perf["Gross_Exposure"] = float(strat.gross_exposure.median())
-    perf["Turnover_Monthly"] = float(strat.turnover.mean())
+    # le premier rééquilibrage (mise en place, rotation forcée à 0) est exclu de la moyenne
+    perf["Turnover_Monthly"] = float(strat.turnover.iloc[1:].mean()) if len(strat.turnover) > 1 else 0.0
 
     start, end = strat.returns.index[0], pd.Timestamp(spec.max_date)
     bench_ret = ds.benchmark_daily.iloc[:, 0].pct_change().loc[start:end]
