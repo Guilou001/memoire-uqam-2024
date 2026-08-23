@@ -27,6 +27,8 @@ plots/**/*.png
 reports/*backtesting_report*.html
 workdir/*
 !workdir/.gitkeep
+data/cache_v2/
+logs/
 
 # Secrets
 .env

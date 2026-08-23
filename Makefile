@@ -36,5 +36,18 @@ run-thesis-us:
 results:          ## reconstruit results/tables/*.csv à partir des sorties archivées du mémoire
 	$(PY) scripts/collect_thesis_results.py
 
+# ---- version 2 (paquet mlrp) ----
+v2-equivalence:   ## vérifie que mlrp reproduit les prédictions et rendements archivés (Ridge US, environ 1 min)
+	$(PY) scripts/check_v2_equivalence.py
+
+v2-main:          ## 8 modèles x 2 pays x 3 signaux x 2 modes, période 2008-2024, 8 processus
+	$(UV) run mlrp run --country both --period 2008-2024 --models thesis --signals all --jobs 8
+
+v2-thesis:        ## toutes les périodes (long)
+	$(UV) run mlrp thesis --country both --jobs 8
+
+v2-figures:
+	$(UV) run mlrp figures --country usa --period 2008-2024 && $(UV) run mlrp figures --country canada --period 2008-2024
+
 clean:            ## vide les sorties intermédiaires (jamais data/raw_data ni results/)
 	find data/intermediate_data data/concatenated_data plots reports -type f \( -name '*.csv' -o -name '*.pkl' -o -name '*.html' -o -name '*.png' \) -delete

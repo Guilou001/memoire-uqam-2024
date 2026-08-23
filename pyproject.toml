@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ml-returns-pred"
-version = "1.0.0"
-description = "Évaluation empirique d'actifs canadiens par l'apprentissage automatique : pipeline du mémoire de maîtrise (UQAM, 2024), reproductible."
+version = "2.0.0"
+description = "Évaluation empirique d'actifs canadiens par l'apprentissage automatique : pipeline du mémoire de maîtrise (UQAM, 2024) reproductible (v1) et refondu (v2, mlrp)."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
@@ -39,6 +39,8 @@ dependencies = [
   "seaborn",
   "statsmodels",
   "tqdm",
+  "pyarrow>=15",
+  "tabulate",
 ]
 
 [project.optional-dependencies]
@@ -46,13 +48,14 @@ dev = ["pytest>=8", "ruff>=0.6", "ipykernel"]
 
 [project.scripts]
 ml-returns-pred = "ml_returns_pred.cli:main"
+mlrp = "mlrp.cli:main"
 
 [project.urls]
 Repository = "https://github.com/Guilou001/memoire-uqam-2024"
 Thesis = "https://archipel.uqam.ca/"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/ml_returns_pred"]
+packages = ["src/ml_returns_pred", "src/mlrp"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
