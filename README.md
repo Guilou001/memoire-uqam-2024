@@ -31,6 +31,11 @@ Ce n'est pas un conseil d'investissement et ce n'est pas encore la version corri
 long-short est offerte comme option (`--long-short-mode corrected`) et documentée, l'étude complète refaite
 (univers point-in-time, validation purgée, coûts) est le projet `memoire-2.0`.
 
+Le dépôt contient deux implémentations de la même méthode. `ml_returns_pred` (v1) est le code de 2024, figé pour
+la reproductibilité. `mlrp` (v2, août 2026) est une refonte : mêmes estimateurs et mêmes réglages, mais prédictions
+calculées une fois par modèle puis partagées entre les trois signaux, portefeuille vectorisé, long-short corrigé par
+défaut, exécution parallèle, cache, tests d'équivalence avec 2024 (voir `docs/V2_ARCHITECTURE.md`).
+
 ## 2. Question, données et méthode (résumé du mémoire)
 
 Question : des algorithmes d'apprentissage machine nourris de données macroéconomiques prévoient-ils les rendements
@@ -86,12 +91,15 @@ Scripts : `scripts/compare_long_short_modes.py` ; tables : `results/tables/long_
 
 ```
 memoire-uqam-2024/
-├── src/ml_returns_pred/      code du pipeline (2024) + cli.py, paths.py (2026)
+├── src/ml_returns_pred/      v1 : code du pipeline (2024) + cli.py, paths.py (2026)
+├── src/mlrp/                 v2 : config, data, models, portfolio, metrics, runner, report, cli (2026)
+├── docs/                     VERIFICATION_2026-08-23.md (audit), V2_ARCHITECTURE.md
 ├── config/                   YAML : méta (pipeline, régression, classification) et par stratégie
-├── scripts/                  fetch_data.py, collect_thesis_results.py, compare_long_short_modes.py
-├── tests/                    pytest : calcul long-short, sélection par rang, surcharges de la CLI
+├── scripts/                  fetch_data.py, collect_thesis_results.py, compare_long_short_modes.py, check_v2_equivalence.py
+├── tests/                    pytest (31) : long-short, rangs, CLI, équivalence v2/v1 (dérive, poids, rendements, métriques)
 ├── results/                  archive_2024/<pays>/<période>/<signal>/ (métriques, prédictions, poids, rendements),
 │                             figures/ (PNG), tables/ (tableaux 4.1-4.2 reconstitués, comparaisons long-short)
+│                             v2/ : metrics.csv et rendements quotidiens par exécution (mlrp)
 ├── reports/                  mémoire (PDF, 8 Mo) et résumé officiel
 ├── data/raw_data/            non versionné : prix Yahoo, LCDMA, FRED-MD (voir data/raw_data/README.md)
 └── workdir/                  répertoire de travail : les chemins relatifs du code historique s'y résolvent
@@ -101,7 +109,7 @@ memoire-uqam-2024/
 
 ```bash
 uv sync --locked --all-extras            # Python 3.12, versions épinglées (uv.lock)
-uv run pytest                            # 11 tests, sans données externes
+uv run pytest                            # 31 tests, sans données externes
 uv run python scripts/fetch_data.py      # prix Yahoo ; déposer macro_data.csv (LCDMA) et Fred-MD.csv à la main
 uv run ml-returns-pred list
 uv run ml-returns-pred run --strategy ridge_regressor --country usa --signal top --top 10 --period 2008-2024
@@ -112,6 +120,22 @@ Durées mesurées (M2, 15 cœurs) : Ridge top 10 sur 2008-2024 environ 3 minutes
 les modèles d'arbres sont plus longs. macOS : xgboost et lightgbm exigent `libomp` (`brew install libomp`, ou la
 bibliothèque extraite d'une bouteille Homebrew puis `install_name_tool -add_rpath`). La graine Optuna est 123,
 celle des estimateurs 42 ; les sorties vont dans `data/intermediate_data/`, `plots/` et `reports/`.
+
+### Version 2 (`mlrp`)
+
+```bash
+uv run python scripts/check_v2_equivalence.py   # Ridge US : mlrp contre les sorties archivées de 2024 (environ 1 min)
+uv run mlrp run --country usa --period 2008-2024 --models ridge_regressor --signals top10 --modes corrected,as_published
+uv run mlrp run --country both --period 2008-2024 --models thesis --signals all --jobs 8   # 16 jeux de prédictions, 96 portefeuilles
+uv run mlrp table --country canada --period 2008-2024 && uv run mlrp figures --country canada --period 2008-2024
+```
+
+Les prédictions sont mises en cache dans `data/cache_v2/` (clé : pays, période, modèle, réglage) ; les trois signaux
+et les deux modes de long-short en dérivent sans réentraîner. Équivalence mesurée avec le code de 2024 (Ridge US,
+top 10, 2008-2024) : mêmes hyperparamètres, prédictions à 2,8 × 10⁻⁷, poids identiques, rendements quotidiens à
+1,2 × 10⁻¹⁶ ; la dérive vectorisée égale la boucle de 2024 à 10⁻¹² sur données aléatoires avec trous. Le mode
+`as_published` reproduit aussi un comportement du code de 2024 : un rééquilibrage dont le 1er du mois tombe un
+samedi, un dimanche ou un férié est sauté ; le mode `corrected` rééquilibre au premier jour de bourse suivant.
 
 Ce qui se reproduit exactement : tout le volet États-Unis (les prix bruts de 2024 sont identiques à ceux du mémoire) et
 tout ce qui part des prédictions archivées (`results/archive_2024`). Ce qui se reproduit approximativement : le volet
