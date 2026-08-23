@@ -1,0 +1,18 @@
+prediction_pipeline:
+  estimator_name: "omp_regressor"
+  regressor_dict:
+    n_nonzero_coefs: null  # Nombre désiré de coefficients non nuls dans la solution. Si null, cette valeur est définie à 10 % des caractéristiques (n_features).
+    tol: null              # Norme maximale du résidu. Si non null, cela remplace n_nonzero_coefs.
+    fit_intercept: True    # Calculer ou non l'interception pour ce modèle. Si False, aucune interception ne sera utilisée dans les calculs.
+    precompute: "auto"     # Utiliser ou non une matrice Gram pré-calculée pour accélérer les calculs.
+
+  bayes_search_params_grid:
+    n_nonzero_coefs: "(1, 50)"  # Intervalle pour n_nonzero_coefs, à ajuster en fonction des données
+    tol: "(0.000001, 0.01)"         # Intervalle pour tol, plus petite tolérance peut être utile pour une meilleure précision
+
+  grid_search_params_grid:
+    n_nonzero_coefs: [5, 10, 20]  # Nombre fixe de coefficients non nuls à explorer
+    tol: [1e-5, 1e-4, 1e-3]       # Valeurs fixes de tolérance pour explorer l'effet sur les résultats
+
+analyze_strategy_returns:
+  strategy_name: "OMP_Regressor"

@@ -1,0 +1,66 @@
+prediction_pipeline:
+  estimator_name: "xgboost_regressor"
+  regressor_dict:
+    max_depth: null                   # Profondeur maximale de l'arbre
+    max_leaves: null                  # Nombre maximum de feuilles dans un arbre
+    max_bin: null                     # Nombre maximum de bins pour le gradient boosting histogramme
+    grow_policy: null                 # Stratégie de croissance de l'arbre
+    learning_rate: null               # Taux d'apprentissage
+    n_estimators: null                # Nombre d'arbres boostés à utiliser
+    verbosity: null                   # Niveau de verbosité
+    objective: null                   # Objectif à optimiser
+    booster: null                     # Type de booster (gbtree, gblinear ou dart)
+    tree_method: null                 # Méthode d'arbre à utiliser
+    gamma: null                       # Paramètre de régularisation
+    min_child_weight: null            # Poids minimum des observations dans un noeud
+    max_delta_step: null              # Pas maximum de delta pour chaque mise à jour
+    subsample: null                   # Fraction des données à utiliser pour chaque arbre
+    sampling_method: null             # Méthode de sous-échantillonnage
+    colsample_bytree: null            # Fraction des features à considérer lors de la construction de chaque arbre
+    colsample_bylevel: null           # Fraction des features à chaque niveau de l'arbre
+    colsample_bynode: null            # Fraction des features à chaque noeud
+    reg_alpha: null                   # Terme de régularisation L1
+    reg_lambda: null                  # Terme de régularisation L2
+    scale_pos_weight: null            # Poids de la classe positive pour un déséquilibre de classe
+    base_score: null                  # Score initial pour toutes les observations
+    num_parallel_tree: null           # Nombre d'arbres à construire en parallèle
+    monotone_constraints: null        # Contraintes de monotonie
+    interaction_constraints: null     # Contraintes d'interaction
+    importance_type: null             # Type d'importance des features
+    device: null                      # Appareil à utiliser (e.g., 'gpu')
+    validate_parameters: True         # Valider les paramètres avant l'entraînement
+    enable_categorical: True         # Activer le support des features catégoriques
+    feature_types: null               # Types des features
+    max_cat_to_onehot: null           # Maximum de catégories à convertir en OneHot
+    max_cat_threshold: null           # Seuil maximum pour les catégories
+    multi_strategy: null              # Stratégie multi-classe
+    eval_metric: null                 # Métrique(s) d'évaluation
+    early_stopping_rounds: null       # Nombre d'itérations avant l'arrêt précoce
+    callbacks: null                   # Liste des callbacks
+    random_state: 42                  # Graine aléatoire pour la reproductibilité
+    n_jobs: null                      # Nombre de jobs à utiliser pour l'entraînement
+
+  bayes_search_params_grid:
+    max_depth: "(3, 10)"              # Intervalle pour max_depth
+    learning_rate: "(0.01, 0.3)"      # Intervalle pour learning_rate
+    n_estimators: "(50, 500)"         # Intervalle pour n_estimators
+    subsample: "(0.5, 1.0)"           # Intervalle pour subsample
+    colsample_bytree: "(0.5, 1.0)"    # Intervalle pour colsample_bytree
+    reg_alpha: "(0.0, 1.0)"           # Intervalle pour reg_alpha
+    reg_lambda: "(0.0, 1.0)"          # Intervalle pour reg_lambda
+    gamma: "(0.0, 0.5)"               # Intervalle pour gamma
+    scale_pos_weight: "(1.0, 10.0)"   # Intervalle pour scale_pos_weight
+
+  grid_search_params_grid:
+    max_depth: [3, 5, 10]
+    learning_rate: [0.01, 0.1, 0.2]
+    n_estimators: [100, 200, 300]
+    subsample: [0.8, 1.0]
+    colsample_bytree: [0.8, 1.0]
+    reg_alpha: [0.0, 0.1, 0.5]
+    reg_lambda: [0.0, 0.1, 0.5]
+    gamma: [0.0, 0.1, 0.2]
+    scale_pos_weight: [1.0, 2.0, 5.0]
+
+analyze_strategy_returns:
+  strategy_name: "XGBoost_Regressor"

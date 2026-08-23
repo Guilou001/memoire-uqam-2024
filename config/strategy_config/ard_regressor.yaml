@@ -1,0 +1,35 @@
+prediction_pipeline:
+  estimator_name: "ard_regressor"
+  regressor_dict:
+    max_iter: 300               # Nombre maximal d'itérations. Si None, par défaut à 300.
+    tol: 0.001                  # Tolérance pour arrêter l'algorithme si les poids ont convergé.
+    alpha_1: 0.000001           # Hyper-paramètre : Paramètre de forme pour la distribution Gamma sur alpha.
+    alpha_2: 0.000001           # Hyper-paramètre : Paramètre de taux pour la distribution Gamma sur alpha.
+    lambda_1: 0.000001          # Hyper-paramètre : Paramètre de forme pour la distribution Gamma sur lambda.
+    lambda_2: 0.000001          # Hyper-paramètre : Paramètre de taux pour la distribution Gamma sur lambda.
+    compute_score: False        # Si True, calcule la fonction objectif à chaque étape du modèle.
+    threshold_lambda: 10000     # Seuil pour éliminer (élaguer) les poids ayant une grande précision.
+    fit_intercept: True         # Si le modèle doit calculer l'interception ou non.
+    copy_X: True                # Si True, X sera copié ; sinon, il peut être écrasé.
+    verbose: False              # Mode verbeux lors de l'ajustement du modèle.
+
+  bayes_search_params_grid:
+    max_iter: "(100, 500)"        # Intervalle pour max_iter, pour explorer différents nombres d'itérations.
+    tol: "(0.0001, 0.01)"         # Intervalle pour tol, plus petite tolérance pour une meilleure précision.
+    alpha_1: "(0.0000001, 0.00001)" # Intervalle pour alpha_1.
+    alpha_2: "(0.0000001, 0.00001)" # Intervalle pour alpha_2.
+    lambda_1: "(0.0000001, 0.00001)" # Intervalle pour lambda_1.
+    lambda_2: "(0.0000001, 0.00001)" # Intervalle pour lambda_2.
+    threshold_lambda: "(1000, 100000)" # Intervalle pour threshold_lambda, ajustant la contrainte de régularisation.
+
+  grid_search_params_grid:
+    max_iter: [100, 300, 500]     # Valeurs fixes pour max_iter.
+    tol: [0.0001, 0.001, 0.01]    # Valeurs fixes pour tol.
+    alpha_1: [0.0000001, 0.000001, 0.00001] # Valeurs fixes pour alpha_1.
+    alpha_2: [0.0000001, 0.000001, 0.00001] # Valeurs fixes pour alpha_2.
+    lambda_1: [0.0000001, 0.000001, 0.00001] # Valeurs fixes pour lambda_1.
+    lambda_2: [0.0000001, 0.000001, 0.00001] # Valeurs fixes pour lambda_2.
+    threshold_lambda: [1000, 10000, 100000] # Valeurs fixes pour threshold_lambda.
+
+analyze_strategy_returns:
+  strategy_name: "ARD_Regressor"

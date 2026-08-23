@@ -1,0 +1,186 @@
+folder_cleaner:
+  clean_data: True # à mettre sur True quand on souhaite nettoyer les folders ci-dessous. Attention à cette option car les
+  # résultats des modèles entrainés peuvent être également supprimés.
+  folder_paths: ["../data/intermediate_data/prediction_pipeline/", "../data/intermediate_data/evaluate_model_performance/",
+                 "../data/intermediate_data/create_long_short_portfolio/", "../data/intermediate_data/weighting/",
+                 "../data/intermediate_data/model_explainability/", "../data/intermediate_data/compute_strategy_returns/",
+                 "../data/intermediate_data/analyze_strategy_returns/", "../data/intermediate_data/from_prices_to_returns/",
+                 "../plots/model_explainability/", "../plots/variable_selection/", "../plots/compute_strategy_returns/",
+                 "../data/intermediate_data/hyperparameters_tuned/", "../data/intermediate_data/resample_data/",
+                 "../data/intermediate_data/benchmark_returns/",]
+  extensions: [".csv", ".png", ".html"] # extensions à supprimer seulement si clean_data est sur True
+
+download_data:
+  download_data: True
+  tickers: ["ABX.TO", "AEM.TO", "ATD.TO", "BB.TO", "BBD-B.TO", "BCE.TO", "BMO.TO", "BN.TO", "BLDP.TO", "BNS.TO",
+            "CAE.TO", "CCA.TO", "CCL-B.TO", "CCO.TO", "CM.TO", "CNR.TO", "CTC.TO", "CTC-A.TO", "EMA.TO", "EMP-A.TO",
+            "ENGH.TO", "ENB.TO", "FTS.TO", "FTT.TO", "GIL.TO", "HR-UN.TO", "ENB.TO", "IMO.TO", "L.TO", "MFC.TO",
+            "MFI.TO", "MRU.TO", "MTL.TO", "NA.TO", "ONEX.TO", "POW.TO", "RCI-B.TO", "RY.TO", "SAP.TO", "SJ.TO",
+            "STN.TO", "SU.TO", "T.TO", "TCL-A.TO", "TECK-B.TO", "TRP.TO", "TD.TO", "WN.TO", "WDO.TO", "XIU.TO"]
+
+#  tickers: ['AAPL', 'ABT', 'ACN', 'AMGN', 'AMZN', 'AOS', 'BA', 'CAT', 'CL', 'CMCSA', 'COST', 'CRM', 'CSCO', 'CVX', 'DHR', 'DIS', 'GE',
+#    'GIS', 'GLW', 'GOOGL', 'GS', 'HD', 'HON', 'IBM', 'INTC', 'JNJ', 'JPM', 'KO', 'LIN', 'LLY', 'LMT', 'LOW', 'MCD', 'MDT',
+#    'MMM', 'MRK', 'MSFT', 'NKE', 'PEP', 'PFE', 'PG', 'QCOM', 'SBUX', 'T', 'TXN', 'UNH', 'UPS', 'VZ', 'WMT', 'XOM',]
+
+
+  benchmark_ticker: "" # "^GSPTSE" nasdaq, #^GSPC sp500, #^GSPTSE sptsx60
+
+  start_date:
+    year: 2000
+    month: 1
+    day: 1
+  end_date:
+    year: 2024
+    month: 6
+    day: 1
+  column_to_keep: "Close"
+  interval: "1d"
+  group_by: "ticker"
+  stocks_file_name: "canadian_stocks"
+  benchmark_file_name: "TSX60"
+
+read_data:
+  relative_prices_data_path: ../data/raw_data/canadian_stocks_2000-01-01_to_2024-06-01.csv
+  benchmark_prices_relative_path: ../data/raw_data/TSX60_2000-01-01_to_2024-06-01.csv
+  relative_macro_data_path: ../data/raw_data/macro_data.csv
+
+preprocess_data:
+  max_date: "2024-01-01" # keep data until this date
+  save_data: False
+  preprocess_data_path: ../data/intermediate_data/preprocess_data/
+
+resample_data:
+  frequency: "MS"
+  save_data: False
+  resample_data_path: ../data/intermediate_data/resample_data/
+
+variable_selection: # only pca for now
+  use_pca: False
+  n_components: 100
+  save_plot_path: ../plots/variable_selection/ # null if no plot to save
+  save_data: True
+  variable_selection_path: ../data/raw_data/macro_data_pca.csv
+
+from_prices_to_returns:
+  return_type: "arithmetic"
+  save_data: True
+  from_prices_to_returns_path: ../data/intermediate_data/from_prices_to_returns/
+
+prediction_pipeline:
+#  test_size: 0.67
+  use_existing_predictions: False # Paramètre qui permet d'utiliser les modèles deja entrainés
+  cutoff_date: "2007-12-31" # Date de coupure pour l'entrainement et la prédiction
+  lags: 6
+  optimize_hyperparameters: True # Si oui ou non tu décides d'optimiser les hyperparamètres (conseillé)
+  tuning_method: "bayes" # grid ou bayes, bayes est conseillé
+
+  lags_grid: [12, 24]
+  grid_search_params: {
+    'steps': 1,
+    'aggregate_metric': 'average',
+    'fixed_train_size': True,
+    'gap': 0,
+    'skip_folds': null,
+    'allow_incomplete_fold': True,
+    'levels': null,
+    'refit': False,
+    'return_best': True,
+    'n_jobs': 'auto',
+    'verbose': False,
+    'show_progress': True,
+    'suppress_warnings': False,
+    'output_file': null
+}
+  backtest_params: {
+    'steps': 1,
+    'fixed_train_size': False,
+    'gap': 0,
+    'skip_folds': null,
+    'allow_incomplete_fold': True,
+    'levels': null,
+    'add_aggregated_metric': True,
+    'refit': True, # refit param, à garder sur True la plupart du temps
+    'interval': null,
+    'n_boot': 500,
+    'random_state': 123,
+    'in_sample_residuals': False,
+    'n_jobs': 'auto',
+    'verbose': False,
+    'show_progress': True,
+    'suppress_warnings': True
+}
+  forecaster_params: {
+    'encoding': 'ordinal_category',
+    'transformer_series': null,
+    'transformer_exog': "standard_scaler",
+    'weight_func': null,
+    'series_weights': null,
+    'differentiation': null,
+    'dropna_from_series': False,
+    'fit_kwargs': null,
+    'forecaster_id': null
+}
+
+  bayes_search_params: {
+  'steps': 1,  # Number of steps to predict
+  'aggregate_metric': 'average',  # How to aggregate metrics across multiple series
+  'fixed_train_size': True,  # Fixed training size during cross-validation
+  'gap': 0,  # No gap between training and testing sets
+  'skip_folds': null,  # Not skipping any folds
+  'allow_incomplete_fold': True,  # Allow incomplete fold in cross-validation
+  'levels': null,  # Optimize for all levels
+  'refit': False,  # Refit the model with the best parameters
+  'return_best': True,  # Return the best trial's parameters
+  'n_trials': 50,  # Number of trials for the Bayesian search
+  'random_state': 123,  # Random state for reproducibility
+  'n_jobs': 'auto',  # Use all available cores
+  'verbose': False,  # Minimal verbosity
+  'show_progress': True,  # Show progress bar
+  'suppress_warnings': False,  # Display warnings
+  'engine': 'optuna',  # Use Optuna for Bayesian optimization
+
+}
+#  make_reduction_params:
+#    strategy: "recursive" # try "recursive" for one model and "direct" for multiple models at each fh step
+#    window_length: 12
+#    scitype: "tabular-regressor"
+  tuning_results_save_path: ../data/intermediate_data/hyperparameters_tuned/
+  save_data: True
+  prediction_pipeline_path: ../data/intermediate_data/prediction_pipeline/
+  evaluate_model_performance_path: ../data/intermediate_data/evaluate_model_performance/
+
+create_long_short_portfolio:
+  ranking_strategy: "simple"
+  ascending: False
+  save_data: False
+  create_long_short_portfolio_path: ../data/intermediate_data/create_long_short_portfolio/
+
+weighting:
+  save_data: True
+  weighting_path: ../data/intermediate_data/weighting/
+
+model_explainability:
+  store_last_window: True
+  store_in_sample_residuals: True
+  suppress_warnings: False
+  aggregate: True
+  summary_plot_save_path: ../plots/model_explainability/
+
+compute_strategy_returns:
+  implementation_days: 1
+  transaction_fee: 0.0
+  long_short_mode: "as_published" # as_published (code 2024 : jambes additionnées) ou corrected (long - short)
+  is_long_only: False
+  save_data: True
+  compute_strategy_returns_path: ../data/intermediate_data/compute_strategy_returns/
+
+analyze_strategy_returns:
+  rf: 0.0
+  periods_per_year: 252
+  annualize: True
+  grayscale: False
+  output: "backtesting_report"
+  match_dates: True
+  open_in_browser: True
+  save_data: True
+  analyze_strategy_returns_path: ../data/intermediate_data/analyze_strategy_returns/

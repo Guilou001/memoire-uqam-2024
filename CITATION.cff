@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "Si vous utilisez ce code, citez le logiciel et le mémoire ci-dessous."
+type: software
+title: "ml-returns-pred : pipeline du mémoire « Évaluation empirique d'actifs canadiens par l'apprentissage automatique »"
+version: 1.0.0
+date-released: 2026-08-23
+license: MIT
+repository-code: "https://github.com/Guilou001/memoire-uqam-2024"
+authors:
+  - family-names: Vaudescal
+    given-names: Guillaume
+  - family-names: Vaudescal
+    given-names: Thomas
+    # infrastructure initiale du pipeline (lecture de configuration, gestion de fichiers, 2024)
+keywords:
+  - asset pricing
+  - machine learning
+  - long-short
+  - Canada
+  - TSX
+  - S&P 500
+  - FRED-MD
+  - LCDMA
+preferred-citation:
+  type: thesis
+  title: "Évaluation empirique d'actifs canadiens par l'apprentissage automatique"
+  authors:
+    - family-names: Vaudescal
+      given-names: Guillaume
+  institution:
+    name: "Université du Québec à Montréal (UQAM), Département des sciences économiques"
+  thesis-type: "Mémoire de maîtrise en économique"
+  year: 2024
+  month: 12
+  notes: "Directeurs : Philippe Goulet Coulombe et Dalibor Stevanovic."

@@ -1,0 +1,22 @@
+prediction_pipeline:
+  estimator_name: "linear_regression_regressor"
+  regressor_dict:
+    fit_intercept: True         # Si le modèle doit calculer l'interception ou non.
+    copy_X: True                # Si True, X sera copié ; sinon, il peut être écrasé.
+    n_jobs: null                # Le nombre de jobs à utiliser pour le calcul. None signifie 1 job, -1 utilise tous les processeurs disponibles.
+    positive: False             # Si True, force les coefficients à être positifs.
+
+  bayes_search_params_grid:
+    fit_intercept: [True, False]    # Recherche pour True ou False pour fit_intercept.
+    copy_X: [True]                  # Recherche pour True pour copy_X (généralement pas nécessaire de tester False).
+    n_jobs: "(1, 4)"                  # Intervalle pour n_jobs, testant différentes configurations de parallélisation.
+    positive: [False, True]         # Recherche pour False ou True pour positive.
+
+  grid_search_params_grid:
+    fit_intercept: [True, False]      # Valeurs fixes pour fit_intercept.
+    copy_X: [True]                    # Valeurs fixes pour copy_X.
+    n_jobs: [1, -1]             # Valeurs fixes pour n_jobs.
+    positive: [False, True]           # Valeurs fixes pour positive.
+
+analyze_strategy_returns:
+  strategy_name: "Linear_Regression_Regressor"

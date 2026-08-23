@@ -1,0 +1,25 @@
+prediction_pipeline:
+  estimator_name: "ridge_regressor"
+  regressor_dict:
+    alpha: 0.05
+    fit_intercept: True
+    copy_X: True
+    max_iter: 5000
+    tol: 0.0001
+    solver: "auto"
+    positive: True
+    random_state: 42
+
+  bayes_search_params_grid:
+    alpha: "(0.01, 1.0)"             # Range for regularization strength (alpha)
+    max_iter: "(1000, 10000)"         # Range for the maximum number of iterations
+    tol: "(0.00001, 0.001)"           # Range for tolerance of the optimization
+    solver: ["auto", "lbfgs"]  # Categorical choice for solver
+
+  grid_search_params_grid:
+    alpha: [0.1, 0.2, 0.3]
+    max_iter: [1000, 2000, 3000]
+    solver: ["auto"]
+
+analyze_strategy_returns:
+  strategy_name: "Ridge_Regressor"

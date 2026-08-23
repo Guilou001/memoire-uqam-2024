@@ -1,0 +1,38 @@
+prediction_pipeline:
+  estimator_name: "ada_boost_regressor"
+  regressor_dict: {
+#        'estimator': 'decision_tree_regressor',
+#        'estimator_args': { # estimator args of the regressor
+#    "criterion": "squared_error",
+#    "splitter": "best",
+#    "max_depth": 3,
+#    "min_samples_split": 3,
+#    "min_samples_leaf": 3,
+#    "min_weight_fraction_leaf": 0.0,
+#    "max_features": null,
+#    "random_state": 42,
+#    "max_leaf_nodes": null,
+#    "min_impurity_decrease": 0.0,
+#    "ccp_alpha": 0.0,
+#    "monotonic_cst": null,
+#}, # regressor args
+        'n_estimators': 500,
+        'learning_rate': 0.5,
+        'loss': "exponential",
+        'random_state': 42
+    }
+
+  bayes_search_params_grid:
+    n_estimators: "(50, 500)"        # Range of n_estimators to explore
+    learning_rate: "(0.01, 1.0)"      # Range of learning rates to explore
+    loss: [ "linear", "square", "exponential" ]  # Categorical options for the loss function
+
+  grid_search_params_grid: {
+    'n_estimators': [50, 100, 200],
+    'learning_rate': [0.01, 0.1, 0.5],
+    'loss': ["linear", "square"]
+  }
+
+analyze_strategy_returns:
+  strategy_name: "Ada_Boost_Regressor"
+

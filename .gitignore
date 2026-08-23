@@ -1,0 +1,32 @@
+# Environnements et caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.DS_Store
+.idea/
+.vscode/
+*.egg-info/
+dist/
+build/
+
+# Données brutes (Yahoo Finance : usage personnel, non redistribuées ; FRED-MD et LCDMA : à télécharger,
+# voir scripts/fetch_data.py) et sorties intermédiaires volumineuses
+data/raw_data/*
+!data/raw_data/.keep
+!data/raw_data/README.md
+data/intermediate_data/**/*.csv
+data/intermediate_data/**/*.pkl
+data/intermediate_data/**/*.html
+data/intermediate_data/**/*.png
+data/concatenated_data/**/*.csv
+plots/**/*.png
+reports/*backtesting_report*.html
+workdir/*
+!workdir/.gitkeep
+
+# Secrets
+.env

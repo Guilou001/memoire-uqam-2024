@@ -1,0 +1,42 @@
+from_prices_to_returns:
+  binarize: True
+  fractional_differentiation: False
+
+prediction_pipeline:
+  grid_search_params:
+    'metric': ['pesaran_timmermann_p_value', 'pesaran_timmermann_stat', 'accuracy_score', 'f1_score']
+  backtest_params:
+    'metric': ['pesaran_timmermann_p_value', 'pesaran_timmermann_stat', 'accuracy_score', 'f1_score']
+  bayes_search_params:
+    'metric': ['pesaran_timmermann_p_value', 'pesaran_timmermann_stat', 'accuracy_score', 'f1_score']
+    'kwargs_create_study': {'direction': 'minimize'}  # Additional arguments for creating the Optuna study
+    'kwargs_study_optimize': {}  # Additional arguments for optimizing the study
+  endogenous_pipeline_dict: {} # keep empty when using a classification problem
+  exogenous_pipeline_dict:
+    min_max_scaler: {}
+
+create_long_short_portfolio:
+  use_ranking: False
+  ranking_strategy: "simple"
+  keep_signal_value: False
+  use_ranking_as_signals: False
+  transform_continuous_to_binary: False
+  transform_binary_classification_to_rank: True
+  ascending: False
+  method: "dense"
+  selection_method: "fix"
+  percentile_threshold: 0.1
+  fix_threshold: 1
+
+weighting:
+  strategy_type: "rank_based_weighting"
+  method: "equal" # or equal
+
+#evaluate_model_performance:
+#  metrics: {
+#        "accuracy": {},
+#        "f1_score": {"average": "macro"},
+#        "precision_score": {"average": "macro"},
+#        "recall_score": {"average": "macro"},
+#        "log_loss": {},
+#    }

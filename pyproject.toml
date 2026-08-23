@@ -1,0 +1,73 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ml-returns-pred"
+version = "1.0.0"
+description = "Évaluation empirique d'actifs canadiens par l'apprentissage automatique : pipeline du mémoire de maîtrise (UQAM, 2024), reproductible."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Guillaume Vaudescal" },
+]
+maintainers = [
+  { name = "Guillaume Vaudescal" },
+]
+keywords = ["finance", "asset-pricing", "machine-learning", "long-short", "TSX", "S&P 500", "FRED-MD", "LCDMA", "skforecast", "replication"]
+requires-python = ">=3.12,<3.13"
+# Versions épinglées sur l'environnement qui reproduit les résultats du mémoire (vérifié le 2026-08-23 :
+# prédictions Ridge US identiques à 2,8e-7 près, mêmes hyperparamètres Optuna).
+dependencies = [
+  "numpy==1.26.4",
+  "pandas==2.2.2",
+  "scipy<1.14",
+  "scikit-learn==1.4.2",
+  "skforecast==0.13.0",
+  "optuna==3.6.1",
+  "sktime==0.30.1",
+  "xgboost==2.1.0",
+  "lightgbm==4.4.0",
+  "catboost==1.2.5",
+  "shap==0.45.1",
+  "numba==0.60.0",
+  "joblib",
+  "quantstats-lumi==1.1.5",
+  "yfinance>=0.2.40",
+  "pyyaml",
+  "matplotlib",
+  "seaborn",
+  "statsmodels",
+  "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "ipykernel"]
+
+[project.scripts]
+ml-returns-pred = "ml_returns_pred.cli:main"
+
+[project.urls]
+Repository = "https://github.com/Guilou001/memoire-uqam-2024"
+Thesis = "https://archipel.uqam.ca/"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ml_returns_pred"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["src/ml_returns_pred/prediction_pipeline/prediction_pipeline_sktime.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008", "UP007"]
+
+[tool.ruff.lint.per-file-ignores]
+# Code historique du mémoire (2024) conservé tel quel pour la reproductibilité : on ne réécrit pas sa gestion
+# d'exceptions ni ses variables locales inutilisées.
+"src/ml_returns_pred/**" = ["B904", "B007", "B905", "E722", "F841"]

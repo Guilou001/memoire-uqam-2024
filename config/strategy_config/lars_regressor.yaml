@@ -1,0 +1,25 @@
+prediction_pipeline:
+  estimator_name: "lars_regressor"
+  regressor_dict:
+    fit_intercept: True              # Si True, calcule l'interception pour ce modèle
+    verbose: False                   # Niveau de verbosité
+    precompute: "auto"               # Utilisation d'une matrice de Gram pré-calculée pour accélérer les calculs
+    n_nonzero_coefs: 500             # Nombre cible de coefficients non nuls
+    copy_X: True                     # Si True, X sera copié ; sinon, il peut être écrasé
+    fit_path: True                   # Si True, le chemin complet est stocké dans l'attribut `coef_path_`
+    jitter: null                     # Borne supérieure sur un paramètre de bruit uniforme à ajouter aux valeurs `y`
+    random_state: 42                 # Génération aléatoire pour le jittering
+
+  bayes_search_params_grid:
+    n_nonzero_coefs: "(100, 1000)"   # Intervalle pour n_nonzero_coefs
+    fit_intercept: [True, False]     # Options booléennes pour fit_intercept
+    fit_path: [True, False]          # Options booléennes pour fit_path
+
+  grid_search_params_grid:
+    n_nonzero_coefs: [100, 250, 500]
+    eps: [0.0001, 0.001, 0.01]
+    fit_intercept: [True, False]
+    fit_path: [True]
+
+analyze_strategy_returns:
+  strategy_name: "LARS_Regressor"

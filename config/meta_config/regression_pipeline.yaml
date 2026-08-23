@@ -1,0 +1,47 @@
+from_prices_to_returns:
+  binarize: False
+  fractional_differentiation: False
+
+prediction_pipeline:
+  # Possibilité de changer l'ordre des métriques pour faire des tests.
+  # Seule la première métrique est optimisée dans la liste, les autres sont calculés en fonction du résultat
+  grid_search_params:
+    'metric': ['r_squared_modified', 'mean_squared_error']
+  backtest_params:
+    'metric': ['r_squared_modified', 'mean_squared_error']
+  bayes_search_params:
+    'metric': ['r_squared_modified', 'mean_squared_error']
+    'kwargs_create_study': {'direction': 'maximize'}  # Additional arguments for creating the Optuna study
+    'kwargs_study_optimize': { }  # Additional arguments for optimizing the study
+#  endogenous_pipeline_dict:
+#    min_max_scaler: {}
+#  exogenous_pipeline_dict:
+#    min_max_scaler: {}
+
+create_long_short_portfolio:
+  use_ranking: True #False -> on prend automatiquement les preds au-dessus de 0 -> portefeuille long.
+  ranking_strategy: "simple"
+  keep_signal_value: False
+  transform_continuous_to_binary: False # À mettre True quand use_ranking est False
+  transform_binary_classification_to_rank: False # À mettre True quand use_ranking est False
+  use_ranking_as_signals: True
+  ascending: False
+  method: "first"
+  selection_method: "fix"
+  percentile_threshold: 0.1
+  fix_threshold: 20 # À changer vers 1 quand use_ranking est False
+
+weighting:
+  strategy_type: "rank_based_weighting"
+  method: "equal" # equal exponential random, À changer vers equal quand use_ranking est False
+
+model_explainability:
+  save_data: True
+  model_explainability_path: ../data/intermediate_data/model_explainability/
+
+#evaluate_model_performance:
+#  metrics: {
+#    "mean_absolute_error": {},
+#    "mean_squared_error": {},
+#    "r2_score_modified": {},
+#  }

@@ -1,0 +1,35 @@
+aggregate_data:
+  read_kwargs: {"index_col": 0}
+  file_extension: ".csv"
+  rename_strategy: "replace"
+  merge_kwargs: {'how': 'outer'}
+  save_data: True
+  save_kwargs: {}
+  folder_paths:
+   - "../data/intermediate_data/compute_strategy_returns/"
+   - "../data/intermediate_data/evaluate_model_performance/"
+   - "../data/intermediate_data/analyze_strategy_returns/"
+  save_paths:
+   - "../data/concatenated_data/compute_strategy_returns/strategy_returns_concat.csv"
+   - "../data/concatenated_data/evaluate_model_performance/model_performance_metrics_concat.csv"
+   - "../data/concatenated_data/analyze_strategy_returns/analyze_strategy_returns_concat.csv"
+
+
+visualize_data:
+  method: "logarithmic"
+  log_scale: False
+  title: null
+  xlabel: 'Date'
+  ylabel: 'Cumulative Returns'
+  benchmark_returns_paths: [
+                            '../data/intermediate_data/benchmark_returns/equally_weighted_strategy_returns.csv',
+                            '../data/intermediate_data/benchmark_returns/TSX60_returns.csv'
+#                            '../data/intermediate_data/benchmark_returns/SP500_returns.csv',
+#                            '../data/intermediate_data/benchmark_returns/NASDAQ_returns.csv']
+                             ]
+  benchmark_path: '../data/raw_data/TSX60_2000-01-01_to_2024-06-01.csv'
+  benchmark_read_kwargs: {'index_col': 0}
+  aggregated_strategy_returns_path: '../data/concatenated_data/compute_strategy_returns/strategy_returns_concat.csv'
+  aggregated_strategy_returns_read_kwargs: {'index_col': 0}
+  save_path: '../plots/compute_strategy_returns/cumulative_strategy_returns'
+  subplot_kwargs: {}

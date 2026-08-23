@@ -1,0 +1,30 @@
+prediction_pipeline:
+  estimator_name: "lasso_regressor"
+  regressor_dict:
+    alpha: 0.5
+    fit_intercept: True
+    precompute: False
+    copy_X: True
+    max_iter: 2000
+    tol: 0.0001
+    warm_start: False
+    positive: False
+    random_state: 42
+    selection: "cyclic"
+
+  bayes_search_params_grid:
+    alpha: "(0.01, 1.0)"        # Range for alpha (regularization strength)
+    max_iter: "(1000, 5000)"     # Range for the maximum number of iterations
+    tol: "(0.00001, 0.01)"       # Range for tolerance of optimization
+    warm_start: [True, False]    # Categorical choice for warm start
+    selection: ["cyclic", "random"]  # Categorical choice for selection method
+
+  grid_search_params_grid:
+    alpha: [0.1, 0.2, 0.3]
+    max_iter: [1000, 2000, 3000]
+    tol: [0.0001, 0.001, 0.01]
+    warm_start: [True]
+    selection: ["cyclic"]
+
+analyze_strategy_returns:
+  strategy_name: "Lasso_Regressor"

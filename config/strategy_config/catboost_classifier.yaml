@@ -1,0 +1,130 @@
+prediction_pipeline:
+  estimator_name: "catboost_classifier"
+  regressor_dict:
+    iterations: 500                     # Max count of trees
+    learning_rate: 0.03                 # Step size shrinkage to prevent overfitting
+    depth: 6                            # Depth of a tree
+    l2_leaf_reg: 3.0                    # Coefficient at the L2 regularization term of the cost function
+    model_size_reg: null                # Model size regularization coefficient
+    rsm: null                           # Subsample ratio of columns when constructing each tree
+    loss_function: "Logloss"            # Metric to use in training
+    border_count: 254                   # Number of partitions in numeric features binarization
+    feature_border_type: "GreedyLogSum" # Binarization mode in numeric features binarization
+    per_float_feature_quantization: null # List of float binarization descriptions
+    input_borders: null                 # Input file with borders used in numeric features binarization
+    output_borders: null                # Output file for borders used in numeric features binarization
+    fold_permutation_block: 1           # To accelerate the learning
+    od_pval: null                       # Use overfitting detector to stop training when reaching a specified threshold
+    od_wait: null                       # Number of iterations for overfitting detector
+    od_type: "Iter"                     # Type of overfitting detector
+    nan_mode: "Min"                     # Way to process missing values for numeric features
+    counter_calc_method: "PrefixTest"   # Method used to calculate counters for dataset with Counter type
+    leaf_estimation_iterations: 1       # Number of steps in the gradient when calculating the values in the leaves
+    leaf_estimation_method: "Newton"    # Method used to calculate the values in the leaves
+    thread_count: -1                    # Number of parallel threads used to run CatBoost
+    random_seed: 42                     # Random number seed
+    use_best_model: null                # To limit the number of trees in predict() using the optimal value of the error function
+    best_model_min_trees: null          # Minimal number of trees the best model should have
+    verbose: True                       # Sets the verbosity amount
+    logging_level: "Verbose"            # Logging level
+    metric_period: 1                    # Frequency of iterations to print the information to stdout
+    ctr_leaf_count_limit: null          # Maximum number of leaves with categorical features
+    store_all_simple_ctr: null          # Ignore categorical features not used in feature combinations when choosing candidates for exclusion
+    max_ctr_complexity: 4               # Maximum number of categorical features that can be combined
+    has_time: False                     # Use the order in which objects are represented in the input data
+    allow_const_label: False            # Allow constant label value in dataset
+    target_border: null                 # Border for target binarization
+    classes_count: null                 # Upper limit for the numeric class label
+    class_weights: null                 # Classes weights
+    auto_class_weights: null            # Enables automatic class weights calculation
+    class_names: null                   # Class names
+    one_hot_max_size: null              # Convert the feature to float if the number of different values that it takes exceeds the specified value
+    random_strength: 1.0                # Score standard deviation multiplier
+    random_score_type: "NormalWithModelSizeDecrease" # Type of random noise added to scores
+    name: "experiment"                  # Name displayed in visualization tools
+    ignored_features: null              # Indices or names of features to be excluded when training
+    train_dir: null                     # Directory to record generated files during training
+    custom_loss: null                   # Custom metric function
+    eval_metric: null                   # Metric to optimize custom metric in loss
+    bagging_temperature: null           # Controls intensity of Bayesian bagging
+    save_snapshot: null                 # Enable progress snapshotting for restoring progress after crashes or interruptions
+    snapshot_file: null                 # Learn progress snapshot file path
+    snapshot_interval: 600              # Interval between saving snapshots (seconds)
+    fold_len_multiplier: null           # Fold length multiplier
+    used_ram_limit: null                # Limit on memory consumption
+    gpu_ram_part: 0.95                  # Fraction of the GPU RAM to use for training
+    pinned_memory_size: null            # Size of additional CPU pinned memory used for GPU learning
+    allow_writing_files: True           # Flag to prevent file writing during training
+    final_ctr_computation_mode: "Default" # Compute final CTRs for all pools
+    approx_on_full_history: False       # Calculate approximated value using all preceding rows in the fold
+    boosting_type: null                 # Boosting scheme
+    simple_ctr: null                    # Binarization settings for categorical features
+    combinations_ctr: null              # Combinations CTR settings
+    per_feature_ctr: null               # Per feature CTR settings
+    ctr_description: null               # CTR description
+    ctr_target_border_count: null       # Maximum number of borders used in target binarization for categorical features
+    task_type: "CPU"                    # The calcer type used to train the model
+    devices: null                       # GPU devices to use
+    bootstrap_type: null                # Bootstrap type
+    subsample: null                     # Sample rate for bagging
+    mvs_reg: null                       # Regularization parameter for MVS sampling algorithm
+    sampling_unit: "Object"             # Specify the sampling scheme
+    sampling_frequency: "PerTree"       # Frequency to sample weights and objects when building trees
+    dev_score_calc_obj_block_size: 5000000 # Size of block of samples in score calculation (CPU only)
+    dev_efb_max_buckets: 1024           # Maximum bucket count in exclusive features bundle (CPU only)
+    sparse_features_conflict_fraction: 0.0 # Maximum allowed fraction of conflicting non-default values for features in exclusive features bundle
+    max_depth: null                     # Synonym for depth
+    n_estimators: null                  # Synonym for iterations
+    num_boost_round: null               # Synonym for iterations
+    num_trees: null                     # Synonym for iterations
+    colsample_bylevel: null             # Synonym for rsm
+    reg_lambda: null                    # Synonym for l2_leaf_reg
+    objective: null                     # Synonym for loss_function
+    eta: null                           # Synonym for learning_rate
+    max_bin: null                       # Synonym for border_count
+    scale_pos_weight: null              # Synonym for class_weights
+    early_stopping_rounds: null         # Synonym for od_wait
+    cat_features: null                  # List of categorical features indices or names
+    grow_policy: "SymmetricTree"        # Tree growing policy
+    min_data_in_leaf: 1                 # Minimum training samples count in leaf
+    num_leaves: 31                      # Maximum leaf count in resulting tree (synonym for max_leaves)
+    score_function: "Cosine"            # Score used during tree construction to select the next tree split
+    leaf_estimation_backtracking: null  # Type of backtracking during gradient descent
+    monotone_constraints: null          # Monotone constraints for features
+    feature_weights: null               # Coefficient to multiply split gain with specific feature use
+    penalties_coefficient: 1.0          # Common coefficient for all penalties
+    first_feature_use_penalties: null   # Penalties to first use of specific feature in model
+    per_object_feature_penalties: null  # Penalties for first use of feature for each object
+    model_shrink_rate: 0.0              # Shrinkage of model at the start of each iteration (CPU only)
+    model_shrink_mode: null             # Mode of shrinkage coefficient calculation (CPU only)
+    langevin: False                     # Enables the Stochastic Gradient Langevin Boosting (CPU only)
+    diffusion_temperature: 0.0          # Langevin boosting diffusion temperature (CPU only)
+    posterior_sampling: False           # Set group of parameters for further use Uncertainty prediction
+    boost_from_average: True            # Initialize approx values by best constant value for specified loss function
+    text_features: null                 # List of Text features indices or names
+    tokenizers: null                    # List of tokenizers descriptions
+    dictionaries: null                  # List of dictionaries descriptions
+    feature_calcers: null               # List of calcer descriptions
+    text_processing: null               # Text processing description
+    embedding_features: null            # List of Embedding features indices or names
+
+  bayes_search_params_grid:
+    iterations: "(100, 1000)"          # Interval for iterations
+    depth: "(3, 10)"                   # Interval for depth
+    learning_rate: "(0.01, 0.3)"       # Interval for learning_rate
+    l2_leaf_reg: "(0.1, 10.0)"         # Interval for l2_leaf_reg
+    bagging_temperature: "(0.0, 1.0)"  # Interval for bagging_temperature
+    random_strength: "(0.1, 10.0)"     # Interval for random_strength
+    grow_policy: ["SymmetricTree", "Lossguide"] # Categorical options for grow_policy
+
+  grid_search_params_grid:
+    iterations: [100, 300, 500]
+    depth: [4, 6, 8]
+    learning_rate: [0.01, 0.1, 0.2]
+    l2_leaf_reg: [0.5, 3.0, 7.0]
+    bagging_temperature: [0.0, 0.5, 1.0]
+    random_strength: [1.0, 2.0, 5.0]
+    grow_policy: ["SymmetricTree", "Lossguide"]
+
+analyze_strategy_returns:
+  strategy_name: "CatBoost_Classifier"

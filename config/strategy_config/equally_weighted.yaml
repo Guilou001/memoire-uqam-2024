@@ -1,0 +1,30 @@
+from_prices_to_returns:
+  binarize: False
+  fractional_differentiation: False
+  benchmark_returns_path: ../data/intermediate_data/benchmark_returns/
+
+create_long_short_portfolio:
+  use_ranking: False
+  ranking_strategy: "simple"
+  keep_signal_value: False
+  transform_continuous_to_binary: True
+  transform_binary_classification_to_rank: True
+  ascending: False
+  method: "first"
+  selection_method: "fix"
+  percentile_threshold: 0.1
+  fix_threshold: 1
+
+weighting:
+  strategy_type: "rank_based_weighting"
+  method: "equal"
+  save_data: True
+  weighting_path: ../data/intermediate_data/weighting/
+
+compute_strategy_returns:
+  is_long_only: True
+  save_data: True
+  benchmark_returns_path: ../data/intermediate_data/benchmark_returns/
+
+analyze_strategy_returns:
+  strategy_name: "Equally_Weighted"

@@ -1,0 +1,35 @@
+prediction_pipeline:
+  estimator_name: "logistic_regression_classifier"
+  regressor_dict:
+    penalty: 'elasticnet'
+    dual: False
+    tol: 0.0001
+    C: 10
+    fit_intercept: True
+    intercept_scaling: 1
+    class_weight: null
+    random_state: 42
+    solver: "saga"
+    max_iter: 500
+    multi_class: "auto"
+    verbose: 0
+    warm_start: True
+    n_jobs: null
+    l1_ratio: null
+
+  bayes_search_params_grid:
+    tol: "(0.00001, 0.01)"                      # Range for tolerance of optimization
+    C: "(0.1, 100.0)"                            # Range for inverse regularization strength
+    solver: ["saga"]                    # Categorical choice for solver
+    max_iter: "(100, 1000)"                      # Range for maximum number of iterations
+    warm_start: [True, False]                    # Categorical choice for warm start
+    l1_ratio: "(0.0, 1.0)"                       # Range for L1 ratio, relevant if elasticnet is chosen
+
+  grid_search_params_grid:
+    tol: [0.0001, 0.001, 0.01]
+    C: [1.0, 10.0]
+    max_iter: [50, 100, 200]
+    solver: ["lbfgs", "liblinear"]
+
+analyze_strategy_returns:
+  strategy_name: "Logistic_Regression_Classifier"
