@@ -38,9 +38,11 @@ défaut, exécution parallèle, cache, tests d'équivalence avec 2024 (voir `doc
 
 ## 2. Question, données et méthode (résumé du mémoire)
 
-Question : des algorithmes d'apprentissage machine nourris de données macroéconomiques prévoient-ils les rendements
-mensuels d'actions au Canada et aux États-Unis, et des portefeuilles longs-courts bâtis sur ces prévisions
-battent-ils les indices ?
+Question de recherche, telle que posée dans l'introduction du mémoire : « Dans quelle mesure l'utilisation
+d'algorithmes d'apprentissage machine linéaire et non-linéaire de régression et de classification permet-elle de
+prédire les rendements d'actifs financiers canadiens, et quelles sont les performances de ces portefeuilles
+construits à partir de ces prédictions, suivant des stratégies longues et courtes avec différents signaux, en
+comparant avec le marché américain ? »
 
 | Élément | Canada | États-Unis |
 |---|---|---|
@@ -87,6 +89,20 @@ classement des prévisions ; la jambe « short » tenue longue fait aussi bien q
 Canada). Un seul modèle garde un vrai alpha long-short dans ce tableau, Extra Trees aux États-Unis.
 Scripts : `scripts/compare_long_short_modes.py` ; tables : `results/tables/long_short_modes_*.csv`.
 
+### Les figures
+
+![Huit modèles, top 10, États-Unis, mode tel que publié](results/v2/figures/usa/2008-2024_top10_as_published.png)
+
+*Mode « tel que publié » : les deux jambes sont détenues à l'achat (le code de 2024 additionnait la jambe « short »), l'exposition brute est de 200 % ; les courbes montent comme deux portefeuilles d'actions superposés.*
+
+![Huit modèles, top 10, États-Unis, mode corrigé](results/v2/figures/usa/2008-2024_top10_corrected.png)
+
+*Mode « corrigé » : jambe courte réellement soustraite (portefeuille couvert, 100 % long, 100 % court). Trois modèles survivent aux États-Unis ; les figures Canada sont dans `results/v2/figures/canada/`.*
+
+![Importance SHAP des variables macro, Extra Trees, États-Unis, top 10](results/figures/usa/2008-01%20%C3%A0%202024-01/Top%2010/summary_plot_extra_trees_regressor.png)
+
+*Importance des variables par SHAP (sortie archivée de 2024) : base monétaire (BOGMBASE), taux de change, emploi manufacturier et production industrielle dominent pour l'Extra Trees américain. Les figures SHAP des autres modèles, pays et périodes sont dans `results/figures/<pays>/<période>/<signal>/` (`summary_plot_*.png` pour l'essaim, `bar_plot_*.png` pour le classement moyen).*
+
 ### Les huit modèles, top 10, version 2 (mesuré le 2026-08-23, `results/v2/metrics.csv`)
 
 TCAC en années civiles, brut de coûts, 2008-01 → 2024-01. « Publié » : mode `as_published` de la v2, qui reproduit le code de
@@ -124,7 +140,8 @@ memoire-uqam-2024/
 ├── scripts/                  fetch_data.py, collect_thesis_results.py, compare_long_short_modes.py, check_v2_equivalence.py
 ├── tests/                    pytest (31) : long-short, rangs, CLI, équivalence v2/v1 (dérive, poids, rendements, métriques)
 ├── results/                  archive_2024/<pays>/<période>/<signal>/ (métriques, prédictions, poids, rendements),
-│                             figures/ (PNG), tables/ (tableaux 4.1-4.2 reconstitués, comparaisons long-short)
+│                             figures/ (PNG 2024 : rendements cumulés, SHAP summary_plot et bar_plot),
+│                             tables/ (tableaux 4.1-4.2 reconstitués, comparaisons long-short)
 │                             v2/ : metrics.csv et rendements quotidiens par exécution (mlrp)
 ├── reports/                  mémoire (PDF, 8 Mo) et résumé officiel
 ├── data/raw_data/            non versionné : prix Yahoo, LCDMA, FRED-MD (voir data/raw_data/README.md)
