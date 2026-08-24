@@ -1,0 +1,42 @@
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique des portefeuilles long short, 2020-01/2024-01 (classification)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l *{7}{S[table-format=3.2]} | *{7}{S[table-format=3.2]}}
+\toprule
+\midrule
+& \multicolumn{7}{c}{Canada} & \multicolumn{7}{c}{États-Unis} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-15}
+& \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Long short 10} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Régression logistique & 0,61 & 0,11 & -5,85 & -0,24 & -0,32 & 49,41 & 0,96 & 0,58 & 0,25 & 5,68 & 0,59 & 0,82 & 18,50 & 1,10 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,62 & 0,10 & -6,82 & -0,29 & -0,39 & \bfseries\color{Green}52,88 & 0,95 & 0,53 & 0,41 & \bfseries\color{Green}6,46 & \bfseries\color{Green}0,66 & \bfseries\color{Green}0,94 & 17,11 & \bfseries\color{Green}1,12 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,69 & \bfseries\color{Green}0,02$^{**}$ & -4,48 & -0,15 & -0,21 & 47,35 & 0,97 & \bfseries\color{Green}0,68 & \bfseries\color{Green}0,05$^{**}$ & 5,98 & 0,61 & 0,87 & 16,61 & 1,11 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,57 & 0,13 & \bfseries\color{Green}-3,45 & \bfseries\color{Green}-0,09 & \bfseries\color{Green}-0,13 & 47,35 & \bfseries\color{Green}0,98 & 0,54 & 0,50 & 5,33 & 0,56 & 0,79 & \bfseries\color{Green}19,64 & 1,10 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Long short 20} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Régression logistique & 0,61 & 0,11 & -4,16 & -0,33 & -0,46 & \bfseries\color{Green}34,04 & 0,94 & 0,58 & 0,25 & \bfseries\color{Green}5,70 & \bfseries\color{Green}0,77 & \bfseries\color{Green}1,11 & 14,10 & \bfseries\color{Green}1,13 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,62 & 0,10 & -3,14 & -0,24 & -0,33 & 30,89 & 0,96 & 0,53 & 0,41 & 0,49 & 0,10 & 0,14 & \bfseries\color{Green}16,05 & 1,02 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,69 & \bfseries\color{Green}0,02$^{**}$ & -3,04 & -0,22 & -0,31 & 29,47 & 0,96 & \bfseries\color{Green}0,68 & \bfseries\color{Green}0,05$^{**}$ & 4,42 & 0,59 & 0,84 & 15,02 & 1,10 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,57 & 0,13 & \bfseries\color{Green}-2,53 & \bfseries\color{Green}-0,18 & \bfseries\color{Green}-0,25 & 29,47 & \bfseries\color{Green}0,97 & 0,54 & 0,50 & 5,61 & 0,76 & 1,10 & 14,49 & 1,13 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Long short $\gtrless$ 0} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Régression logistique & 0,61 & 0,11 & -13,15 & -0,61 & -0,88 & \bfseries\color{Green}56,73 & 0,88 & 0,58 & 0,25 & \bfseries\color{Green}13,16 & \bfseries\color{Green}0,69 & \bfseries\color{Green}1,01 & 24,50 & \bfseries\color{Green}1,15 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,62 & 0,10 & 11,42 & 0,70 & 0,97 & 26,53 & 1,14 & 0,53 & 0,41 & -4,27 & -0,23 & -0,31 & \bfseries\color{Green}33,41 & 0,95 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,69 & \bfseries\color{Green}0,02$^{**}$ & -8,89 & -0,38 & -0,55 & 48,60 & 0,92 & \bfseries\color{Green}0,68 & \bfseries\color{Green}0,05$^{**}$ & 3,00 & 0,25 & 0,35 & 31,76 & 1,05 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,57 & 0,13 & \bfseries\color{Green}15,59 & \bfseries\color{Green}0,84 & \bfseries\color{Green}1,27 & 27,97 & \bfseries\color{Green}1,19 & 0,54 & 0,50 & 9,43 & 0,54 & 0,76 & 30,81 & 1,11 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Même pondération &  &  & 11,68 & 0,66 &  &  &  &  &  & 9,97 & 0,56 &  &  &  \\ \addlinespace[0.1cm]
+Indice (TSX / S\&P 500) &  &  & 5,29 & 0,36 &  &  &  &  &  & 13,77 & 0,61 &  &  &  \\ \addlinespace[0.1cm]
+\bottomrule
+\end{tabular}}
+\end{table}

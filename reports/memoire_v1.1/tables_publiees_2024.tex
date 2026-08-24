@@ -1,0 +1,392 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\definecolor{Gray}{gray}{0.9}  % Définissez la couleur que vous souhaitez utiliser
+\definecolor{Green}{rgb}{0,0.5,0}  % Définir une couleur verte personnalisée
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{geometry}
+\usepackage[french]{babel}
+\usepackage{booktabs}
+\geometry{hmargin=1.5cm,vmargin=3cm}
+\usepackage{siunitx}
+\usepackage{array}
+\usepackage{makecell}
+
+\sisetup{
+  round-mode = places,
+  round-precision = 2,
+  output-decimal-marker = {,},
+  group-digits = integer,
+  detect-all,    % Active la détection de toutes les caractéristiques (poids, couleur, etc.)
+  mode = text
+}
+
+\newcolumntype{R}{>{\raggedleft\arraybackslash}S} % Alignement à droite
+\newcolumntype{B}{>{\bfseries}S} % Alignement à droite en gras
+
+\begin{document}
+
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2008-01/2024-01 (régression)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l *{6}{R} | *{6}{R}}
+\toprule
+\midrule
+& \multicolumn{6}{c}{Canada} & \multicolumn{6}{c}{États-Unis} \\
+\cmidrule(lr){2-7} \cmidrule(lr){8-13}
+& \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte 10} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -1,18 & \bfseries\color{Green}16,51 & \bfseries\color{Green}0,81 & \bfseries\color{Green}1,16 & \bfseries64,37 & \bfseries1,16 & -0,39 & 12,97 & 0,64 & 0,93 & 73,69 & 1,13 \\ \addlinespace[0.1cm]
+XGBoost & -0,25 & 11,95 & 0,65 & 0,91 & 65,49 & 1,13 & -0,21 & 11,36 & 0,61 & 1,87 & 69,54 & 1,13 \\ \addlinespace[0.1cm]
+Ada Boost & -0,11 & 14,77 & 0,75 & 1,05 & 70,02 & 1,15 & -0,55 & 11,77 & 0,60 & 0,86 & 76,92 & 1,13 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}-0,01 & 10,99 & 0,59 & 0,83 & 70,50 & 1,12 & \bfseries\color{Green}-0,01 & \bfseries\color{Green}14,56 & \bfseries\color{Green}0,71 & \bfseries\color{Green}1,02 & \bfseries66,57 & \bfseries1,15 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte 20} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -1,18 & 12,00 & 0,67 & 0,94 & 66,75 & 1,14 & -0,39 & \bfseries14,25 & \bfseries0,70 & \bfseries1,00 & \bfseries69,84 & \bfseries1,15 \\ \addlinespace[0.1cm]
+XGBoost & -0,25 & \bfseries12,32 & \bfseries0,69 & \bfseries0,97 & \bfseries63,52 & \bfseries1,14 & -0,21 & 13,01 & 0,66 & 0,94 & 70,49 & 1,14 \\ \addlinespace[0.1cm]
+Ada Boost & -0,11 & 11,37 & 0,64 & 0,90 & 67,27 & 1,14 & -0,48 & 13,43 & 0,67 & 0,96 & 72,59 & 1,14 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}-0,01 & 11,91 & 0,67 & 0,94 & 62,57 & 1,14 & \bfseries\color{Green}-0,01 & 13,49 & 0,68 & 0,97 & 69,89 & 1,14 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -1,18 & 9,40 & \bfseries0,69 & \bfseries1,06 & \bfseries\color{Green}37,96 & \bfseries\color{Green}1,17 & -0,39 & 8,51 & 0,67 & 0,97 & \bfseries\color{Green}41,01 & 1,14 \\ \addlinespace[0.1cm]
+XGBoost & -0,25 & 9,06 & 0,55 & 0,77 & 67,75 & 1,11 & -0,21 & 8,83 & 0,54 & 0,78 & 62,14 & 1,13 \\ \addlinespace[0.1cm]
+Ada Boost & -0,11 & 3,71 & 0,33 & 0,45 & 65,90 & 1,07 & -0,48 & 10,74 & \bfseries0,67 & \bfseries0,98 & 65,87 & \bfseries\color{Green}1,16 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}-0,01 & \bfseries11,34 & 0,65 & 0,91 & 64,33 & 1,14 & \bfseries\color{Green}-0,01 & \bfseries13,21 & 0,67 & 0,95 & 69,87 & 1,14 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Même Pondération & & 5,86 & 0,45 & 0,55 & \bfseries44,59 & 1,09 & & 7,19 & 0,64 & 0,90 & \bfseries42,96 & \bfseries1,13 \\ 
+\addlinespace[0.1cm]
+TSX60 & & 1,76 & 0,23 & 0,31 & 49,80 & 1,05 & & 1,76 & 0,23 & 0,31 & 49,80 & 1,05 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & 5,28 & 0,42 & 0,53 & 53,25 & 1,09 & & 5,28 & 0,42 & 0,53 & 53,25 & 1,09 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & \bfseries7,84 & \bfseries0,59 & \bfseries0,83 & 51,26 & \bfseries1,12 & & \bfseries7,84 & \bfseries0,59 & \bfseries0,83 & 51,26 & 1,12 \\ 
+\addlinespace[0.1cm]
+\midrule
+\bottomrule
+\end{tabular}}
+\end{table}
+ 
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2008-01/2012-01 (régression)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l *{6}{S[table-format=2.2]} | *{6}{S[table-format=2.2]}}
+\toprule
+\midrule
+& \multicolumn{6}{c}{Canada} & \multicolumn{6}{c}{États-Unis} \\
+\cmidrule(lr){2-7} \cmidrule(lr){8-13}
+& \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte 10} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -1,70 & \bfseries\color{Green}10,07 & \bfseries\color{Green}0,54 & \bfseries\color{Green}0,78 & \bfseries61,22 & \bfseries\color{Green}1,10 & -0,43 & 4,78 & 0,40 & 0,59 & 71,34 & 1,08 \\ \addlinespace[0.1cm]
+XGBoost & \bfseries\color{Green}0,08 & 0,70 & 0,26 & 0,36 & 69,77 & 1,05 & -0,25 & 2,96 & 0,36 & 0,52 & 76,27 & 1,07 \\ \addlinespace[0.1cm]
+Ada Boost & -0,07 & 8,87 & 0,50 & 0,73 & 62,05 & 1,09 & -0,46 & 6,76 & 0,44 & 0,64 & 72,18 & 1,09 \\ \addlinespace[0.1cm]
+Extra Trees & 0,00 & 1,01 & 0,28 & 0,39 & 70,50 & 1,05 & \bfseries\color{Green}-0,01 & \bfseries\color{Green}7,47 & \bfseries\color{Green}0,46 & \bfseries\color{Green}0,66 & \bfseries66,57 & \bfseries\color{Green}1,09 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte 20} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -1,70 & \bfseries6,94 & \bfseries0,44 & \bfseries0,63 & \bfseries60,48 & \bfseries1,09 & -0,43 & 3,44 & 0,35 & 0,51 & 70,78 & 1,07 \\ \addlinespace[0.1cm]
+XGBoost & \bfseries\color{Green}0,08 & 4,27 & 0,35 & 0,50 & 63,27 & 1,07 & -0,25 & 1,96 & 0,32 & 0,45 & 73,99 & 1,06 \\ \addlinespace[0.1cm]
+Ada Boost & -0,07 & 5,32 & 0,39 & 0,55 & 62,95 & 1,08 & -0,46 & \bfseries4,51 & \bfseries0,38 & \bfseries0,55 & \bfseries69,63 & \bfseries1,08 \\ \addlinespace[0.1cm]
+Extra Trees & 0,00 & 4,47 & 0,36 & 0,51 & 62,57 & 1,07 & \bfseries\color{Green}-0,01 & 3,44 & 0,35 & 0,50 & 69,89 & 1,07 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -1,70 & \bfseries6,22 & \bfseries0,48 & \bfseries0,69 & \bfseries\color{Green}37,13 & \bfseries1,09 & -0,43 & \bfseries4,86 & \bfseries0,39 & \bfseries0,56 & \bfseries\color{Green}41,02 & \bfseries1,08 \\ \addlinespace[0.1cm]
+XGBoost & \bfseries\color{Green}0,08 & -4,24 & 0,07 & 0,10 & 68,11 & 1,01 & -0,25 & 2,31 & 0,30 & 0,43 & 66,82 & 1,06 \\ \addlinespace[0.1cm]
+Ada Boost & -0,07 & -2,93 & 0,07 & 0,10 & 65,89 & 1,02 & -0,46 & 4,20 & 0,35 & 0,49 & 53,21 & 1,07 \\ \addlinespace[0.1cm]
+Extra Trees & 0,00 & 4,20 & 0,35 & 0,49 & 63,22 & 1,07 & \bfseries\color{Green}-0,01 & 2,89 & 0,34 & 0,48 & 69,88 & 1,07 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Même Pondération & & \bfseries1,29 & \bfseries0,19 & \bfseries0,27 & \bfseries40,10 & \bfseries1,04 & & \bfseries2,50 & \bfseries0,27 & \bfseries0,38 & \bfseries42,96 & \bfseries1,05 \\ 
+\addlinespace[0.1cm]
+TSX60 & & -2,61 & -0,02 & -0,02 & 49,80 & 1,00 & & -2,61 & -0,02 & -0,02 & 49,80 & 1,00 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & -2,40 & -0,01 & -0,02 & 53,25 & 1,00 & & -2,40 & -0,01 & -0,02 & 53,25 & 1,00 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & -0,03 & 0,15 & 0,21 & 51,26 & 1,03 & & -0,03 & 0,15 & 0,21 & 51,26 & 1,03 \\ 
+\addlinespace[0.1cm]
+\bottomrule
+\midrule
+\end{tabular}}
+\end{table}
+
+
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2012-01/2020-01 (régression)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l *{6}{S[table-format=2.2]} | *{6}{S[table-format=2.2]}}
+\toprule
+\midrule
+& \multicolumn{6}{c}{Canada} & \multicolumn{6}{c}{États-Unis} \\
+\cmidrule(lr){2-7} \cmidrule(lr){8-13}
+& \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte 10} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -0,35 & 16,04 & 1,02 & 1,51 & 31,17 & 1,19 & -0,15 & 18,17 & 1,06 & 1,51 & 33,36 & 1,21 \\ \addlinespace[0.1cm]
+XGBoost & -0,04 & \bfseries\color{Green}19,26 & \bfseries1,19 & \bfseries1,77 & \bfseries25,53 & \bfseries1,22 & \bfseries\color{Green}-0,05 & 20,33 & 1,18 & 1,69 & 32,21 & 1,23 \\ \addlinespace[0.1cm]
+Ada Boost & -0,78 & 14,31 & 0,94 & 1,37 & 30,24 & 1,17 & -0,18 & \bfseries\color{Green}23,95 & \bfseries\color{Green}1,33 & \bfseries\color{Green}1,93 & 33,74 & \bfseries1,26 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}-0,01 & 17,16 & 1,02 & 1,50 & 38,70 & 1,19 & -0,07 & 21,60 & 1,23 & 1,76 & \bfseries28,60 & 1,24 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte 20} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -0,35 & 15,66 & 1,15 & 1,66 & \bfseries26,84 & 1,21 & -0,15 & 19,83 & 1,18 & 1,68 & \bfseries30,36 & 1,23 \\ \addlinespace[0.1cm]
+XGBoost & -0,04 & 17,18 & 1,25 & 1,82 & 27,03 & 1,23 & \bfseries\color{Green}-0,05 & \bfseries20,34 & \bfseries1,21 & \bfseries1,74 & 31,25 & \bfseries1,24 \\ \addlinespace[0.1cm]
+Ada Boost & -0,78 & \bfseries17,28 & \bfseries\color{Green}1,26 & \bfseries\color{Green}1,82 & 28,75 & \bfseries\color{Green}1,23 & -0,18 & 20,29 & 1,20 & 1,72 & 33,50 & 1,24 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}-0,01 & 16,73 & 1,24 & 1,80 & 28,55 & 1,23 & -0,07 & 19,95 & 1,19 & 1,71 & 29,64 & 1,24 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -0,35 & 9,49 & 0,72 & 1,10 & 27,21 & 1,19 & -0,15 & 9,97 & 1,18 & 1,69 & \bfseries\color{Green}16,70 & 1,23 \\ \addlinespace[0.1cm]
+XGBoost & -0,04 & 12,84 & 0,69 & 1,16 & 46,03 & 1,16 & \bfseries\color{Green}-0,05 & 15,74 & 1,23 & 1,81 & 19,67 & 1,25 \\ \addlinespace[0.1cm]
+Ada Boost & -0,78 & 10,73 & 0,69 & 1,03 & 45,68 & 1,14 & -0,18 & 18,09 & \bfseries1,30 & \bfseries1,94 & 22,70 & \bfseries\color{Green}1,27 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}-0,01 & \bfseries16,27 & \bfseries1,22 & \bfseries1,77 & \bfseries27,05 &\bfseries1,23 & -0,07 & \bfseries19,67 & 1,18 & 1,69 & 31,34 & 1,23 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Même Pondération & & 7,92 & \bfseries1,17 & \bfseries1,70 & \bfseries\color{Green}13,56 & \bfseries1,22 & & 9,89 & \bfseries1,18 & \bfseries1,68 & \bfseries16,71 & \bfseries1,23 \\ 
+\addlinespace[0.1cm]
+TSX60 & & 2,93 & 0,45 & 0,61 & 24,36 & 1,08 & & 2,93 & 0,45 & 0,61 & 24,36 & 1,08 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & 8,34 & 0,98 & 1,36 & 19,78 & 1,20 & & 8,34 & 0,98 & 1,36 & 19,78 & 1,20 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & \bfseries11,11 & 1,07 & 1,52 & 23,64 & 1,21 & & \bfseries11,11 & 1,07 & 1,52 & 23,64 & 1,21 \\ 
+\addlinespace[0.1cm]
+\bottomrule
+\midrule
+\end{tabular}}
+\end{table}
+
+
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2020-01/2024-01 (régression)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l *{6}{S[table-format=2.2]} | *{6}{S[table-format=2.2]}}
+\toprule
+\midrule
+& \multicolumn{6}{c}{Canada} & \multicolumn{6}{c}{États-Unis} \\
+\cmidrule(lr){2-7} \cmidrule(lr){8-13}
+& \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte 10} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -2,55 & \bfseries\color{Green}21,45 & \bfseries\color{Green}0,87 & \bfseries\color{Green}1,22 & \bfseries62,79 & \bfseries\color{Green}1,19 & -0,90 & 9,49 & 0,52 & 0,74 & 55,45 & 1,11 \\ \addlinespace[0.1cm]
+XGBoost & \bfseries\color{Green}0,05 & 6,05 & 0,42 & 0,58 & 69,72 & 1,09 & -0,22 & \bfseries11,62 & \bfseries\color{Green}0,59 & \bfseries\color{Green}0,84 & \bfseries50,63 & \bfseries\color{Green}1,12 \\ \addlinespace[0.1cm]
+Ada Boost & -0,42 & 2,39 & 0,30 & 0,40 & 66,92 & 1,06 & -1,19 & 9,55 & 0,52 & 0,74 & 55,78 & 1,11 \\ \addlinespace[0.1cm]
+Extra Trees & -0,01 & 8,28 & 0,49 & 0,67 & 63,42 & 1,10 & \bfseries\color{Green}-0,14 & 9,57 & 0,52 & 0,74 & 56,13 & 1,11 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte 20} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -2,55 & \bfseries12,13 & \bfseries0,62 & \bfseries0,86 & \bfseries60,80 & \bfseries1,14 & -0,90 & \bfseries\color{Green}11,72 & \bfseries0,59 & \bfseries0,84 & 56,53 & \bfseries1,12 \\ \addlinespace[0.1cm]
+XGBoost & \bfseries\color{Green}0,05 & 7,75 & 0,48 & 0,65 & 65,11 & 1,10 & -0,22 & 11,11 & 0,57 & 0,81 & 57,11 & 1,12 \\ \addlinespace[0.1cm]
+Ada Boost & -0,42 & 5,25 & 0,39 & 0,53 & 65,13 & 1,09 & -1,19 & 10,23 & 0,55 & 0,77 & 56,11 & 1,11 \\ \addlinespace[0.1cm]
+Extra Trees & -0,01 & 9,18 & 0,52 & 0,72 & 62,15 & 1,12 & \bfseries\color{Green}-0,14 & 10,30 & 0,55 & 0,78 & \bfseries55,71 & 1,11 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Ridge & -2,55 & 4,62 & 0,42 & 0,57 & \bfseries38,14 & 1,09 & -0,90 & 6,39 & 0,51 & 0,72 & \bfseries31,61 & 1,11 \\ \addlinespace[0.1cm]
+XGBoost & \bfseries\color{Green}0,05 & \bfseries13,43 & \bfseries0,63 & \bfseries0,89 & 64,55 & \bfseries1,14 & -0,22 & 6,79 & 0,44 & 0,62 & 56,78 & 1,09 \\ \addlinespace[0.1cm]
+Ada Boost & -0,42 & 1,38 & 0,22 & 0,31 & 53,15 & 1,06 & -1,19 & 9,20 & 0,63 & 0,91 & 38,13 & 1,13 \\ \addlinespace[0.1cm]
+Extra Trees & -0,01 & 8,16 & 0,49 & 0,66 & 64,54 & 1,11 & \bfseries\color{Green}-0,14 & 6,85 & 0,56 & 0,79 & 32,08 & 1,12 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & \\
+\addlinespace[0.1cm]
+Même Pondération & & 5,64 & 0,51 & 0,69 & 36,23 & 1,11 & & 6,70 & 0,56 & 0,79 & \bfseries\color{Green}30,59 & \bfseries1,12 \\ 
+\addlinespace[0.1cm]
+TSX60 & & 3,58 & 0,36 & 0,48 & 37,42 & 1,08 & & 3,58 & 0,36 & 0,48 & 37,42 & 1,08 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & 6,82 & 0,54 & 0,74 & \bfseries\color{Green}33,92 & 1,10 & & 6,82 & 0,54 & 0,74 & 33,92 & 1,10 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & \bfseries9,06 & \bfseries0,60 & \bfseries0,84 & 36,40 & \bfseries1,11 & & \bfseries9,06 & \bfseries0,60 & \bfseries0,84 & 36,40 & 1,11 \\ 
+\addlinespace[0.1cm]
+\bottomrule
+\midrule
+\end{tabular}}
+\end{table}
+
+
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2008-01/2024-01 (classification)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l*{7}{S[table-format=2.2]}|*{7}{S[table-format=2.2]}}
+\toprule
+\midrule
+& \multicolumn{7}{c}{Canada} & \multicolumn{7}{c}{États-Unis} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-15}
+& \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & & &\\
+\addlinespace[0.1cm]
+Régression logistique & 0,56 & 0,13 & \bfseries\color{Green}8,96 & \bfseries\color{Green}0,62 & \bfseries\color{Green}0,86 & 65,99 & \bfseries\color{Green}1,15 & \bfseries\color{Green}0,58 & \bfseries\color{Green}0,11 & 8,81 & \bfseries\color{Green}0,64 & \bfseries\color{Green}0,91 & \bfseries\color{Green}42,04 & \bfseries\color{Green}1,13 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,57 & 0,18 & 6,50 & 0,49 & 0,69 & 66,17 & 1,11 & 0,51 & 0,52 & \bfseries\color{Green}11,36 & 0,61 & 0,87 & 69,54 & 1,13 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,66 & \bfseries\color{Green}0,01$^{**}$ & 5,88 & 0,55 & 0,76 & \bfseries\color{Green}37,96 & 1,12 & 0,52 & 0,52 & 8,15 & 0,53 & 0,75 & 64,27 & 1,11 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,56 & 0,20 & 5,25 & 0,49 & 0,69 & 42,89 & 1,11 & 0,51 & 0,72 & 7,29 & 0,61 & 0,88 & 43,86 & 1,13 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & & &\\
+\addlinespace[0.1cm]
+Même Pondération & & & 5,86 & 0,45 & 0,55 & \bfseries44,59 & 1,09 & & & 7,19 & \bfseries0,64 & \bfseries0,90 & \bfseries42,96 & \bfseries1,13 \\ 
+\addlinespace[0.1cm]
+TSX60 & & & 1,76 & 0,23 & 0,31 & 49,80 & 1,05 & & & 1,76 & 0,23 & 0,31 & 49,80 & 1,05 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & & 5,28 & 0,42 & 0,53 & 53,25 & 1,09 & & & 5,28 & 0,42 & 0,53 & 53,25 & 1,09 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & & \bfseries7,84 & \bfseries0,59 & \bfseries0,83 & 51,26 & \bfseries1,12 & & & \bfseries7,84 & 0,59 & 0,83 & 51,26 & 1,12 \\ 
+\addlinespace[0.1cm]
+\bottomrule
+\midrule
+\end{tabular}}
+\end{table}
+
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2008-01/2012-01 (classification)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l*{7}{S[table-format=2.2]}|*{7}{S[table-format=2.2]}}
+\toprule
+\midrule
+& \multicolumn{7}{c}{Canada} & \multicolumn{7}{c}{États-Unis} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-15}
+& \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & & &\\
+\addlinespace[0.1cm]
+Régression logistique & 0,53 & 0,37 & -0,17 & 0,13 & 0,18 & 51,29 & 1,03 & 0,57 & 0,22 & 0,54 & 0,18 & 0,25 & 46,83 & 1,03 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,61 & 0,19 & 5,26 & 0,39 & 0,57 & 66,37 & 1,08 & 0,51 & 0,50 & 2,66 & \bfseries\color{Green}0,34 & \bfseries\color{Green}0,49 & 69,38 & \bfseries\color{Green}1,07 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,65 & \bfseries\color{Green}0,10 & \bfseries\color{Green}8,56 & \bfseries\color{Green}0,52 & \bfseries\color{Green}0,82 & 42,78 & \bfseries\color{Green}1,11 & \bfseries\color{Green}0,64 & \bfseries\color{Green}0,07$^{*}$ & 2,53 & 0,28 & 0,39 & 51,04 & 1,05 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,54 & 0,34 & 3,59 & 0,35 & 0,49 & \bfseries\color{Green}37,13 & 1,07 & 0,55 & 0,35 & \bfseries\color{Green}3,00 & 0,29 & 0,42 & \bfseries\color{Green}41,02 & 1,06 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & & &\\
+Même Pondération & & & \bfseries1,29 & \bfseries0,19 & \bfseries0,27 & \bfseries40,10 & \bfseries1,04 & & & \bfseries2,50 & \bfseries0,27 & \bfseries0,38 & \bfseries42,96 & \bfseries1,05 \\ 
+\addlinespace[0.1cm]
+TSX60 & & & -2,61 & -0,02 & -0,02 & 49,80 & 1,00 & & & -2,61 & -0,02 & -0,02 & 49,80 & 1,00 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & & -2,40 & -0,01 & -0,02 & 53,25 & 1,00 & & & -2,40 & -0,01 & -0,02 & 53,25 & 1,00 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & & -0,03 & 0,15 & 0,21 & 51,26 & 1,03 & & & -0,03 & 0,15 & 0,21 & 51,26 & 1,03 \\
+\bottomrule
+\midrule
+\end{tabular}}
+\end{table}
+
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2012-01/2020-01 (classification)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l*{7}{S[table-format=2.2]}|*{7}{S[table-format=2.2]}}
+\toprule
+\midrule
+& \multicolumn{7}{c}{Canada} & \multicolumn{7}{c}{États-Unis} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-15}
+& \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & & &\\
+\addlinespace[0.1cm]
+Régression logistique & \bfseries\color{Green}0,65 & \bfseries\color{Green}0,07* & 11,41 & 1,05 & 1,62 & 21,94 & 1,22 & 0,57 & 0,32 & 13,32 & 1,07 & 1,53 & 27,03 & 1,23 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,58 & 0,25 & 20,94 & 0,93 & 1,43 & 43,57 & 1,20 & 0,52 & 0,57 & 17,64 & 1,07 & 1,52 & 37,33 & 1,21 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & 0,58 & 0,24 & \bfseries\color{Green}21,29 & 0,94 & 1,58 & 46,26 & 1,22 & 0,60 & \bfseries\color{Green}0,06* & 15,25 & 1,09 & 1,55 & \bfseries23,76 & 1,23 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,57 & 0,25 & 8,18 & \bfseries\color{Green}1,22 & \bfseries\color{Green}1,77 & \bfseries14,32 & \bfseries\color{Green}1,23 & \bfseries\color{Green}0,61 & 0,50 & \bfseries\color{Green}19,67 & \bfseries\color{Green}1,18 & \bfseries\color{Green}1,69 & 31,34 & 
+\bfseries\color{Green}1,23 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & & &\\
+Même Pondération & & & 7,92 & \bfseries1,17 & \bfseries1,70 & \bfseries\color{Green}13,56 & \bfseries1,22 & & & 9,89 & \bfseries1,18 & \bfseries1,68 & \bfseries\color{Green}16,71 & \bfseries1,23 \\ 
+\addlinespace[0.1cm]
+TSX60 & & & 2,93 & 0,45 & 0,61 & 24,36 & 1,08 & & & 2,93 & 0,45 & 0,61 & 24,36 & 1,08 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & & 8,34 & 0,98 & 1,36 & 19,78 & 1,20 & & & 8,34 & 0,98 & 1,36 & 19,78 & 1,20 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & & \bfseries11,11 & 1,07 & 1,52 & 23,64 & 1,21 & & & \bfseries11,11 & 1,07 & 1,52 & 23,64 & 1,21 \\ 
+\bottomrule
+\midrule
+\end{tabular}}
+\end{table}
+
+\newpage
+
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique pour les prédictions mensuelles 2020-01/2024-01 (classification)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l*{7}{S[table-format=2.2]}|*{7}{S[table-format=2.2]}}
+\toprule
+\midrule
+& \multicolumn{7}{c}{Canada} & \multicolumn{7}{c}{États-Unis} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-15}
+& \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Longue-courte $\gtrless$ 0} & & & & & & & & & & & & & &\\
+\addlinespace[0.1cm]
+Régression logistique & 0,65 & 0,06 & 3,77 & 0,36 & 0,48 & 38,08 & 1,08 & 0,57 & 0,27 & 7,08 & 0,51 & 0,73 & \bfseries31,61 & 1,10 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,58 & 0,17 & \bfseries\color{Green}17,42 & \bfseries\color{Green}0,98 & \bfseries\color{Green}1,43 & \bfseries37,99 & \bfseries\color{Green}1,22 & 0,53 & 0,41 & 5,96 & 0,41 & 0,57 & 56,05 & 1,09 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,75 & \bfseries\color{Green}0,00$^{***}$ & 1,00 & 0,23 & 0,31 & 63,56 & 1,06 & \bfseries\color{Green}0,63 & \bfseries\color{Green}0,11 & 1,32 & 0,23 & 0,32 & 57,31 & 1,06 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,56 & 0,14 & 5,52 & 0,49 & 0,66 & 38,14 & 1,11 & 0,54 & 0,50 & \bfseries\color{Green}10,65 & \bfseries0,56 & \bfseries0,79 & 56,05 & \bfseries\color{Green}1,12 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} & & & & & & & & & & & & & &\\
+Même Pondération & & & 5,64 & 0,51 & 0,69 & 36,23 & 1,11 & & & 6,70 & 0,56 & 0,79 & \bfseries\color{Green}30,59 & \bfseries1,12 \\ 
+\addlinespace[0.1cm]
+TSX60 & & & 3,58 & 0,36 & 0,48 & 37,42 & 1,08 & & & 3,58 & 0,36 & 0,48 & 37,42 & 1,08 \\ 
+\addlinespace[0.1cm]
+S\&P500 & & & 6,82 & 0,54 & 0,74 & \bfseries\color{Green}33,92 & 1,10 & & & 6,82 & 0,54 & 0,74 & 33,92 & 1,10 \\ 
+\addlinespace[0.1cm]
+NASDAQ & & & \bfseries9,06 & \bfseries0,60 & \bfseries0,84 & 36,40 & \bfseries1,11 & & & \bfseries9,06 & \bfseries\color{Green}0,60 & \bfseries\color{Green}0,84 & 36,40 & 1,11 \\ 
+\bottomrule
+\midrule
+\end{tabular}}
+\end{table}
+
+\end{document}

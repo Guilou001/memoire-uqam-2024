@@ -11,18 +11,18 @@ rendu reproductible en 2026 : environnement figé, ligne de commande, 32 tests, 
 ![rapport](https://img.shields.io/badge/m%C3%A9moire-PDF-lightgrey)
 
 **Résultat en une phrase.** Huit modèles d'apprentissage machine, nourris de centaines de variables
-macroéconomiques, tentent de prédire chaque mois les rendements de 50 actions américaines et 49 actions
+macroéconomiques, tentent de prédire chaque mois les rendements de 50 actions américaines et 50 actions
 canadiennes de 2008 à 2024 ; les portefeuilles long short construits sur ces prédictions rapportent au mieux
-**7,4 % par an** aux États-Unis (Sharpe 0,80) et ne dépassent **1,1 %** au Canada, tous sous un simple
-portefeuille équipondéré (11 %). La prédiction de rendements mensuels par la macro est un problème très difficile,
+**7,4 % par an** aux États-Unis (Sharpe 0,80) et **5,6 %** au Canada (Sharpe 0,40), tous sous un simple
+portefeuille équipondéré (11 à 12 %). La prédiction de rendements mensuels par la macro est un problème très difficile,
 et ce dépôt montre précisément pourquoi.
 
-*English summary.* Full, reproducible pipeline of my MSc thesis: monthly returns of 49 TSX and 50 S&P 500 stocks
+*English summary.* Full, reproducible pipeline of my MSc thesis: monthly returns of 50 TSX and 50 S&P 500 stocks
 predicted with Canadian (LCDMA, 410 series) and US (FRED-MD, 126 series) macro data; eight ML regressors and
 classifiers (Ridge, XGBoost, AdaBoost, Extra Trees, and their classification counterparts); top 10 / top 20 /
 positive-prediction signals; equal-weight long short portfolios, 2008-2024, walk-forward with monthly refits.
-Best long short result: 7.4 % CAGR (Sharpe 0.80, US HistGradientBoosting); no Canadian model beats 1.1 %; all
-trail the 11 % equal-weight benchmark. Out-of-sample R² are negative throughout. SHAP feature-importance figures,
+Best long short result: 7.4 % CAGR (Sharpe 0.80, US HistGradientBoosting) and 5.6 % in Canada (XGBoost); all
+trail the 11-12 % equal-weight benchmark. Out-of-sample R² are negative throughout. SHAP feature-importance figures,
 pinned environment (uv), CLI, 32 tests. Limits (hyperparameter selection on the test period, survivor universe,
 macro alignment) are quantified in section 8.
 
@@ -53,7 +53,7 @@ littérature. Presque tout ce travail porte sur les États-Unis.
 Ce que ce dépôt apporte :
 
 - **Un volet canadien.** Les 410 séries macroéconomiques canadiennes de la base LCDMA (Fortin-Gagnon, Leroux,
-  Stevanovic et Surprenant, 2022) appliquées à la prédiction de 49 actions du TSX, avec la même méthode que le
+  Stevanovic et Surprenant, 2022) appliquées à la prédiction de 50 actions du TSX, avec la même méthode que le
   volet américain, ce qui permet une vraie comparaison entre les deux marchés.
 - **Une réplication complète et honnête.** Tout le pipeline du mémoire est réexécutable commande par commande,
   chaque chiffre vient d'un fichier de résultats, et les limites sont mesurées plutôt que passées sous silence
@@ -70,7 +70,7 @@ commité dans le dépôt.
 
 | | Canada | États-Unis |
 |---|---|---|
-| **Actions** | 49 titres du TSX 60, prix Yahoo ajustés | 50 titres du S&P 500 |
+| **Actions** | 50 titres du TSX (depuis la v1.1 : CNQ et CGI remplacent le doublon ENB et le FNB XIU de 2024), prix Yahoo ajustés | 50 titres du S&P 500 |
 | **Macro** | LCDMA, 410 séries mensuelles (1981 →) | FRED-MD, 126 séries mensuelles (1959 →) |
 | **Indices de référence** | S&P/TSX composite | S&P 500, NASDAQ |
 | **Fréquence** | mensuelle (prix en début de mois) | idem |
@@ -122,22 +122,23 @@ viennent de `results/v2/metrics.csv`, régénérable par une commande (section 7
 
 | Modèle | É.-U. TCAC | É.-U. Sharpe | É.-U. perte max. | Canada TCAC | Canada Sharpe | Canada perte max. |
 |---|---:|---:|---:|---:|---:|---:|
-| Ridge (rég.) | −0,9 % | 0,00 | −44,6 % | −7,5 % | −0,35 | −77,4 % |
-| XGBoost (rég.) | −0,6 % | 0,02 | −57,9 % | −1,3 % | 0,02 | −52,7 % |
-| AdaBoost (rég.) | 0,4 % | 0,10 | −33,6 % | −0,5 % | 0,07 | −46,0 % |
-| Extra Trees (rég.) | 6,9 % | 0,76 | −19,6 % | −2,3 % | −0,07 | −49,8 % |
-| Logistique (class.) | 6,7 % | 0,72 | −24,8 % | −2,0 % | −0,05 | −44,6 % |
-| XGBoost (class.) | 4,9 % | 0,52 | −20,4 % | 1,1 % | 0,15 | −40,2 % |
-| **Hist Gradient Boosting (class.)** | **7,4 %** | **0,80** | −18,1 % | −3,2 % | −0,12 | −53,5 % |
-| Extra Trees (class.) | 5,6 % | 0,63 | −17,4 % | −2,2 % | −0,06 | −49,8 % |
+| Ridge (rég.) | −0,9 % | 0,00 | −44,6 % | −6,6 % | −0,30 | −75,8 % |
+| XGBoost (rég.) | −0,6 % | 0,02 | −57,9 % | 5,6 % | 0,40 | −35,4 % |
+| AdaBoost (rég.) | 0,4 % | 0,10 | −33,6 % | 1,3 % | 0,16 | −46,2 % |
+| Extra Trees (rég.) | 6,9 % | 0,76 | −19,6 % | −3,5 % | −0,13 | −56,8 % |
+| Logistique (class.) | 6,7 % | 0,72 | −24,8 % | −2,9 % | −0,10 | −51,3 % |
+| XGBoost (class.) | 4,9 % | 0,52 | −20,4 % | −1,5 % | −0,01 | −48,2 % |
+| **Hist Gradient Boosting (class.)** | **7,4 %** | **0,80** | −18,1 % | −1,6 % | −0,01 | −48,0 % |
+| Extra Trees (class.) | 5,6 % | 0,63 | −17,4 % | −3,5 % | −0,13 | −56,8 % |
 
 Points de comparaison sur la même période : **S&P 500 : 11,4 %** (Sharpe 0,59) ; équipondéré des 50 titres
-américains : 11,1 % (0,66) ; **composite TSX : 2,6 %** (0,24) ; équipondéré des 49 titres canadiens : 11,5 % (0,79).
+américains : 11,1 % (0,66) ; **composite TSX : 2,6 %** (0,24) ; équipondéré des 50 titres canadiens : 11,9 % (0,80).
 
 Comment lire ce tableau, en trois constats :
 
 - **Aucun portefeuille long short ne bat le simple équipondéré.** Le meilleur modèle américain rapporte 7,4 % par
-  an, l'équipondéré 11,1 % avec moins de complexité. Au Canada, aucun modèle ne dépasse 1,1 %. En revanche, les
+  an, l'équipondéré 11,1 % avec moins de complexité. Au Canada, un seul modèle ressort (XGBoost régresseur, 5,6 %,
+  Sharpe 0,40), toujours sous l'équipondéré à 11,9 %. En revanche, les
   pertes maximales des long short sont bien plus faibles (−18 % contre −50 % environ pour les indices en 2008-2009) :
   c'est l'intérêt d'une stratégie couverte, elle amortit les krachs.
 - **Les R² hors échantillon sont négatifs partout** (par exemple −0,40 en moyenne pour le Ridge américain) : les
@@ -201,7 +202,7 @@ Le code de 2024 reste exécutable à l'identique : `uv run ml-returns-pred run -
 | Hyperparamètres choisis sur la période de test (fuite de sélection) | reconnu ; validation purgée prévue dans `memoire-2.0` |
 | Variables macro alignées un mois en avance sur le rendement prédit (convention du code de 2024) | mesuré : en alignement temps réel, le TCAC du Ridge américain passe de −0,9 % à −3,3 % et le R² moyen de −0,40 à −0,46 (`scripts/check_exog_alignment.py`) ; l'ordre de grandeur des conclusions ne change pas |
 | Prédictions identiques pour tous les titres à la plupart des dates pour plusieurs modèles (classement alphabétique de fait) | mesuré par modèle : `results/v2/tables/prediction_ties.csv` et `scripts/check_prediction_ties.py` |
-| Univers figé de titres survivants (biais de survie), 49 titres canadiens dont le FNB XIU.TO | reconnu ; univers point-in-time prévu dans `memoire-2.0` |
+| Univers figé de titres survivants (biais de survie) ; celui de 2024 comptait 49 titres canadiens dont le FNB XIU.TO, la v1.1 passe à 50 vrais titres (CNQ, CGI) | reconnu ; univers point-in-time prévu dans `memoire-2.0` |
 | Coûts de transaction à zéro, poids égaux, rééquilibrage mensuel | reconnu ; option `--fee` disponible |
 | Données macro en millésime final (les révisions ne sont pas simulées) | reconnu |
 | Prix Yahoo ajustés révisés dans le temps (le volet canadien retéléchargé diffère un peu de 2024) | mesuré (corrélation 0,96 des prévisions) |

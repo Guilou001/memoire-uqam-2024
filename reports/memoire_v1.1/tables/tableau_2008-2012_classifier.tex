@@ -1,0 +1,42 @@
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique des portefeuilles long short, 2008-01/2012-01 (classification)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l *{7}{S[table-format=3.2]} | *{7}{S[table-format=3.2]}}
+\toprule
+\midrule
+& \multicolumn{7}{c}{Canada} & \multicolumn{7}{c}{États-Unis} \\
+\cmidrule(lr){2-8} \cmidrule(lr){9-15}
+& \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{SP} & \textit{PT} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Long short 10} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Régression logistique & 0,57 & 0,27 & -11,77 & -0,60 & -0,85 & 42,55 & 0,90 & 0,54 & \bfseries\color{Green}0,31 & 7,99 & 0,77 & 1,15 & 15,80 & 1,14 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,61 & 0,22 & \bfseries\color{Green}7,69 & \bfseries\color{Green}0,53 & \bfseries\color{Green}0,77 & 13,45 & \bfseries\color{Green}1,09 & 0,51 & 0,50 & 7,14 & 0,64 & 0,95 & \bfseries\color{Green}17,40 & 1,11 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,62 & \bfseries\color{Green}0,13 & -5,15 & -0,19 & -0,26 & 31,19 & 0,97 & 0,52 & 0,46 & \bfseries\color{Green}9,56 & \bfseries\color{Green}0,84 & \bfseries\color{Green}1,31 & 9,19 & \bfseries\color{Green}1,16 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,55 & 0,35 & -11,31 & -0,59 & -0,83 & \bfseries\color{Green}47,15 & 0,90 & \bfseries\color{Green}0,55 & 0,35 & 7,22 & 0,71 & 1,05 & 15,19 & 1,13 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Long short 20} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Régression logistique & 0,57 & 0,27 & -6,00 & -0,52 & -0,73 & 25,41 & 0,91 & 0,54 & \bfseries\color{Green}0,31 & 3,83 & 0,47 & 0,68 & \bfseries\color{Green}16,62 & 1,08 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,61 & 0,22 & -4,05 & -0,31 & -0,42 & 28,06 & 0,95 & 0,51 & 0,50 & 1,36 & 0,20 & 0,29 & 13,85 & 1,03 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,62 & \bfseries\color{Green}0,13 & \bfseries\color{Green}-0,77 & \bfseries\color{Green}-0,01 & \bfseries\color{Green}-0,01 & 25,77 & \bfseries\color{Green}1,00 & 0,52 & 0,46 & 2,47 & 0,32 & 0,47 & 10,46 & 1,06 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,55 & 0,35 & -6,65 & -0,60 & -0,85 & \bfseries\color{Green}30,83 & 0,90 & \bfseries\color{Green}0,55 & 0,35 & \bfseries\color{Green}4,45 & \bfseries\color{Green}0,54 & \bfseries\color{Green}0,78 & 16,62 & \bfseries\color{Green}1,09 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Long short $\gtrless$ 0} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Régression logistique & 0,57 & 0,27 & 4,11 & 0,31 & 0,44 & 35,91 & 1,06 & 0,54 & \bfseries\color{Green}0,31 & \bfseries\color{Green}3,49 & \bfseries\color{Green}0,26 & \bfseries\color{Green}0,37 & 25,40 & \bfseries\color{Green}1,05 \\ \addlinespace[0.1cm]
+XGBoost Classification & 0,61 & 0,22 & \bfseries\color{Green}9,15 & \bfseries\color{Green}0,54 & 0,75 & 20,00 & \bfseries\color{Green}1,11 & 0,51 & 0,50 & -6,60 & -0,37 & -0,51 & 47,26 & 0,93 \\ \addlinespace[0.1cm]
+Hist Gradient Boosting Classification & \bfseries\color{Green}0,62 & \bfseries\color{Green}0,13 & -1,97 & 0,22 & 0,26 & \bfseries\color{Green}62,65 & 1,06 & 0,52 & 0,46 & -5,79 & -0,30 & -0,39 & 39,87 & 0,94 \\ \addlinespace[0.1cm]
+Extra Trees Classification & 0,55 & 0,35 & 8,72 & 0,52 & \bfseries\color{Green}0,75 & 23,54 & 1,10 & \bfseries\color{Green}0,55 & 0,35 & -6,91 & -0,15 & -0,22 & \bfseries\color{Green}47,60 & 0,97 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} &  &  &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Même pondération &  &  & 6,62 & 0,42 &  &  &  &  &  & 5,39 & 0,33 &  &  &  \\ \addlinespace[0.1cm]
+Indice (TSX / S\&P 500) &  &  & -3,59 & -0,01 &  &  &  &  &  & -0,45 & 0,13 &  &  &  \\ \addlinespace[0.1cm]
+\bottomrule
+\end{tabular}}
+\end{table}

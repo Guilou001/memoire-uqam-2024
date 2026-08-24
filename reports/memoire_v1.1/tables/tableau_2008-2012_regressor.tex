@@ -1,0 +1,42 @@
+\begin{table}[h]
+\centering
+\small
+\caption{Résumé statistique des portefeuilles long short, 2008-01/2012-01 (régression)}
+\vspace{.2cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l *{6}{S[table-format=3.2]} | *{6}{S[table-format=3.2]}}
+\toprule
+\midrule
+& \multicolumn{6}{c}{Canada} & \multicolumn{6}{c}{États-Unis} \\
+\cmidrule(lr){2-7} \cmidrule(lr){8-13}
+& \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} & \textit{\(R^2_{\text{HÉ}}\)} & \textit{\(r^A\)} & \textit{SR} & \textit{ST} & \textit{P\,$^{\text{max}}$} & \textit{$\Omega$} \\
+\midrule
+\rowcolor{Gray}
+\textbf{Long short 10} &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Ridge & -1,21 & -13,91 & -0,66 & -0,86 & \bfseries\color{Green}60,39 & 0,89 & -0,44 & -7,62 & -0,47 & -0,63 & \bfseries\color{Green}43,92 & 0,92 \\ \addlinespace[0.1cm]
+XGBoost & -0,11 & -3,54 & -0,13 & -0,18 & 36,02 & 0,98 & -0,25 & \bfseries\color{Green}10,75 & \bfseries\color{Green}0,72 & \bfseries\color{Green}1,07 & 24,99 & \bfseries\color{Green}1,13 \\ \addlinespace[0.1cm]
+Ada Boost & -0,05 & \bfseries\color{Green}2,28 & \bfseries\color{Green}0,21 & \bfseries\color{Green}0,30 & 33,94 & \bfseries\color{Green}1,04 & -0,46 & 6,16 & 0,52 & 0,77 & 14,42 & 1,09 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}0,01 & -11,31 & -0,59 & -0,83 & 47,15 & 0,90 & \bfseries\color{Green}-0,00 & 7,08 & 0,69 & 1,04 & 15,19 & 1,12 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Long short 20} &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Ridge & -1,21 & -8,16 & -0,57 & -0,75 & \bfseries\color{Green}47,46 & 0,90 & -0,44 & -2,79 & -0,22 & -0,30 & \bfseries\color{Green}26,14 & 0,96 \\ \addlinespace[0.1cm]
+XGBoost & -0,11 & -1,93 & -0,12 & -0,17 & 21,67 & 0,98 & -0,25 & \bfseries\color{Green}8,20 & \bfseries\color{Green}0,80 & \bfseries\color{Green}1,16 & 14,14 & \bfseries\color{Green}1,14 \\ \addlinespace[0.1cm]
+Ada Boost & -0,05 & \bfseries\color{Green}0,34 & \bfseries\color{Green}0,09 & \bfseries\color{Green}0,13 & 25,79 & \bfseries\color{Green}1,02 & -0,46 & 6,59 & 0,71 & 1,02 & 12,79 & 1,13 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}0,01 & -6,65 & -0,60 & -0,85 & 30,83 & 0,90 & \bfseries\color{Green}-0,00 & 4,75 & 0,57 & 0,82 & 16,62 & 1,10 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Long short $\gtrless$ 0} &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Ridge & -1,21 & \bfseries\color{Green}7,71 & \bfseries\color{Green}0,48 & \bfseries\color{Green}0,70 & 30,57 & \bfseries\color{Green}1,09 & -0,44 & -3,21 & -0,02 & -0,03 & 51,94 & 1,00 \\ \addlinespace[0.1cm]
+XGBoost & -0,11 & -4,07 & -0,17 & -0,23 & 30,48 & 0,97 & -0,25 & -3,07 & -0,04 & -0,06 & 33,99 & 0,99 \\ \addlinespace[0.1cm]
+Ada Boost & -0,05 & -0,40 & 0,14 & 0,20 & \bfseries\color{Green}43,43 & 1,03 & -0,46 & -0,48 & 0,13 & 0,18 & \bfseries\color{Green}59,37 & 1,03 \\ \addlinespace[0.1cm]
+Extra Trees & \bfseries\color{Green}0,01 & 5,17 & 0,35 & 0,49 & 38,45 & 1,07 & \bfseries\color{Green}-0,00 & \bfseries\color{Green}4,40 & \bfseries\color{Green}0,30 & \bfseries\color{Green}0,42 & 42,34 & \bfseries\color{Green}1,06 \\ \addlinespace[0.1cm]
+\rowcolor{Gray}
+\textbf{Critères de références} &  &  &  &  &  &  &  &  &  &  &  & \\
+\addlinespace[0.1cm]
+Même pondération &  & 6,62 & 0,42 &  &  &  &  & 5,39 & 0,33 &  &  &  \\ \addlinespace[0.1cm]
+Indice (TSX / S\&P 500) &  & -3,59 & -0,01 &  &  &  &  & -0,45 & 0,13 &  &  &  \\ \addlinespace[0.1cm]
+\bottomrule
+\end{tabular}}
+\end{table}

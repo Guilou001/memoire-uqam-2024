@@ -24,8 +24,9 @@ CANADIAN_TICKERS = [
     "CAE.TO", "CCA.TO", "CCL-B.TO", "CCO.TO", "CM.TO", "CNR.TO", "CTC.TO", "CTC-A.TO", "EMA.TO", "EMP-A.TO",
     "ENGH.TO", "ENB.TO", "FTS.TO", "FTT.TO", "GIL.TO", "HR-UN.TO", "IMO.TO", "L.TO", "MFC.TO", "MFI.TO",
     "MRU.TO", "MTL.TO", "NA.TO", "ONEX.TO", "POW.TO", "RCI-B.TO", "RY.TO", "SAP.TO", "SJ.TO", "STN.TO",
-    "SU.TO", "T.TO", "TCL-A.TO", "TECK-B.TO", "TRP.TO", "TD.TO", "WN.TO", "WDO.TO", "XIU.TO",
-]  # 49 titres uniques : la liste du mémoire contenait ENB.TO deux fois et le FNB XIU.TO
+    "SU.TO", "T.TO", "TCL-A.TO", "TECK-B.TO", "TRP.TO", "TD.TO", "WN.TO", "WDO.TO", "CNQ.TO", "GIB-A.TO",
+]  # 50 titres depuis la v1.1 (2026-08-24) : la liste du mémoire contenait ENB.TO deux fois et le FNB XIU.TO ;
+# XIU.TO est sorti, CNQ.TO (Canadian Natural Resources) et GIB-A.TO (CGI) entrent, cotés sur toute la période
 
 US_TICKERS = [
     "AAPL", "ABT", "ACN", "AMGN", "AMZN", "AOS", "BA", "CAT", "CL", "CMCSA", "COST", "CRM", "CSCO", "CVX",

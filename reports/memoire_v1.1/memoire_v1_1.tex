@@ -1,0 +1,106 @@
+% Mémoire v1.1 : mise à jour des résultats (2026-08-24)
+% Compilé avec tectonic ; tableaux générés par scripts/make_latex_tables.py, figures par mlrp figures / mlrp shap.
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,graphicx,mathtools,amssymb}
+\usepackage[table]{xcolor}
+\definecolor{Gray}{gray}{0.9}
+\definecolor{Green}{rgb}{0,0.5,0}
+\usepackage{booktabs,colortbl,geometry}
+\usepackage[french]{babel}
+\geometry{hmargin=2cm,vmargin=2.5cm}
+\usepackage{siunitx}
+\usepackage{array,makecell}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small}
+
+\title{Évaluation empirique d'actifs canadiens par l'apprentissage automatique\\
+\large Version 1.1 : résultats mis à jour\\
+\normalsize Mise à jour du mémoire de maîtrise (UQAM, décembre 2024)}
+\author{Guillaume Vaudescal}
+\date{24 août 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Ce qui change entre le mémoire de 2024 et cette version 1.1}
+
+Cette mise à jour ne change ni la question de recherche, ni les données macroéconomiques, ni les huit modèles,
+ni la procédure d'entraînement. Elle corrige quatre points d'implémentation et de présentation, puis régénère
+tous les tableaux et toutes les figures avec le pipeline vérifié de 2026
+(\url{https://github.com/Guilou001/memoire-uqam-2024}, paquet \texttt{mlrp}) :
+
+\begin{enumerate}
+  \item \textbf{Le portefeuille long short soustrait désormais réellement le côté short.} Le code de 2024
+  additionnait la contribution du panier short au lieu de la soustraire : les portefeuilles publiés étaient
+  longs des deux côtés (exposition brute de 200~\%). Les résultats ci-dessous appliquent la stratégie telle que
+  décrite au chapitre~3 du mémoire (long les mieux classés, short les moins bien classés).
+  \item \textbf{Le TCAC est calculé en années civiles.} La version 2024 de la bibliothèque de métriques divisait
+  les jours civils par 252, ce qui sous-estimait le rendement annualisé.
+  \item \textbf{L'univers canadien compte 50 titres cotés sur toute la période.} La liste de 2024 contenait un
+  doublon (ENB.TO) et un FNB (XIU.TO) ; CNQ.TO (Canadian Natural Resources) et GIB-A.TO (CGI) les remplacent.
+  \item \textbf{Un rééquilibrage dont le 1\textsuperscript{er} du mois n'est pas un jour de bourse est appliqué
+  au jour de bourse suivant} (le code de 2024 le sautait).
+\end{enumerate}
+
+Deux limites connues restent volontairement en l'état pour préserver la comparabilité avec le mémoire, et sont
+mesurées dans le dépôt : les hyperparamètres sont choisis sur la période de test, et les variables
+macroéconomiques sont alignées un mois en avance sur le rendement prédit. Leur correction est le chantier de la
+version~2. Enfin, plusieurs modèles produisent des prédictions identiques pour tous les titres à la plupart des
+dates (Extra Trees en tête, dont l'élagage retenu réduit chaque arbre à une feuille) ; leurs lignes mesurent
+alors un portefeuille quasi fixe et non un classement, ce que le lecteur doit garder en tête.
+
+% ------------------------------------------------------------------ résultats
+\clearpage
+\section*{Résultats mis à jour}
+
+% PROSE_RESULTATS : rédigée par scripts/make_v11_prose.py une fois le run complet terminé
+\input{prose_resultats.tex}
+
+\clearpage
+\input{tables/tableau_2008-2024_regressor.tex}
+\input{tables/tableau_2008-2024_classifier.tex}
+\clearpage
+\input{tables/tableau_2008-2012_regressor.tex}
+\input{tables/tableau_2008-2012_classifier.tex}
+\clearpage
+\input{tables/tableau_2012-2020_regressor.tex}
+\input{tables/tableau_2012-2020_classifier.tex}
+\clearpage
+\input{tables/tableau_2020-2024_regressor.tex}
+\input{tables/tableau_2020-2024_classifier.tex}
+
+% ------------------------------------------------------------------ figures
+\clearpage
+\section*{Figures mises à jour}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.95\textwidth]{figures/usa_2008-2024_top10_corrected.png}
+\caption{Croissance d'un dollar investi, portefeuilles long short top 10, États-Unis, 2008-01 à 2024-01, sans coûts.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.95\textwidth]{figures/canada_2008-2024_top10_corrected.png}
+\caption{Croissance d'un dollar investi, portefeuilles long short top 10, Canada (50 titres), 2008-01 à 2024-01, sans coûts.}
+\end{figure}
+
+\clearpage
+\begin{figure}[h]
+\centering
+\includegraphics[width=.8\textwidth]{figures/shap_usa_summary_ridge_regressor.png}
+\caption{Importance des variables par SHAP, Ridge, États-Unis, période d'entraînement 2000-2007. Chaque point est
+une observation (un titre, un mois) ; la position horizontale donne la contribution à la prédiction, la couleur la
+valeur de la variable. Contrairement aux figures de 2024, les contributions sont empilées entre les titres et non
+moyennées, et le modèle expliqué porte les hyperparamètres retenus par la recherche bayésienne.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.8\textwidth]{figures/shap_canada_summary_ridge_regressor.png}
+\caption{Importance des variables par SHAP, Ridge, Canada (50 titres), période d'entraînement 2000-2007.}
+\end{figure}
+
+\end{document}
