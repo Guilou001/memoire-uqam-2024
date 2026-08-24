@@ -54,7 +54,7 @@ def test_positive_signal_preset():
     assert lsp["use_ranking"] is False and lsp["fix_threshold"] == 1
     assert lsp["transform_continuous_to_binary"] is True
     assert out["download_data"]["tickers"] == cli.CANADIAN_TICKERS
-    assert len(set(cli.CANADIAN_TICKERS)) == 49 and len(cli.US_TICKERS) == 50
+    assert len(set(cli.CANADIAN_TICKERS)) == 50 and len(cli.US_TICKERS) == 50  # univers v1.1 : 50 titres canadiens
 
 
 def test_yaml_files_are_not_modified_by_overrides(tmp_path):
