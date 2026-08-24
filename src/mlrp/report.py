@@ -69,7 +69,7 @@ def figures_for_period(returns_dir: Path, country: str, period: str, out_dir: Pa
     """Une figure par mode : tous les modèles d'un pays et d'une période (signal top10 si présent)."""
     made = []
     labels = {"usa": "États-Unis", "canada": "Canada"}
-    mode_labels = {"corrected": "long-short corrigé (short soustrait)", "as_published": "tel que publié (deux jambes longues)"}
+    mode_labels = {"corrected": "long short", "as_published": "réplication du code de 2024"}
     for mode in ("corrected", "as_published"):
         series = {}
         for f in sorted((returns_dir / country / period).glob(f"*_top10_{mode}.csv.gz")):

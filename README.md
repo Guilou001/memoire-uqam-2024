@@ -1,203 +1,242 @@
-# Prédire les rendements d'actions canadiennes et américaines avec des données macroéconomiques et l'apprentissage automatique
+# Prédire les rendements d'actions canadiennes et américaines avec des données macroéconomiques et l'apprentissage machine
 
-Pipeline complet du mémoire de maîtrise *Évaluation empirique d'actifs canadiens par l'apprentissage
+Pipeline complet de mon mémoire de maîtrise, *Évaluation empirique d'actifs canadiens par l'apprentissage
 automatique* (Guillaume Vaudescal, UQAM, décembre 2024, dir. Philippe Goulet Coulombe et Dalibor Stevanovic),
-rendu reproductible en août 2026 : environnement épinglé, ligne de commande, tests, résultats archivés, et un
-audit du code qui a révélé deux corrections à apporter à la lecture des résultats publiés.
+rendu reproductible en 2026 : environnement figé, ligne de commande, 32 tests, résultats et figures régénérables
+à l'identique. Le mémoire complet (PDF, 96 pages) est dans [`reports/`](reports/).
 
 [![ci](https://github.com/Guilou001/memoire-uqam-2024/actions/workflows/ci.yml/badge.svg)](https://github.com/Guilou001/memoire-uqam-2024/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![licence](https://img.shields.io/badge/code-MIT-green)
 ![rapport](https://img.shields.io/badge/m%C3%A9moire-PDF-lightgrey)
 
-**Résultat en une phrase.** Le pipeline de 2024 se réexécute à l'identique (prédictions Ridge États-Unis
-égales à 2,8 × 10⁻⁷ près, mêmes hyperparamètres), mais les portefeuilles « longs-courts » du mémoire sont en
-réalité longs sur les deux jambes : une fois le short réellement soustrait, le Ridge top 10 passe d'un TCAC de
-19,3 % à −0,7 % aux États-Unis et de 30,4 % à −8,6 % au Canada (2008-2024, brut de coûts).
+**Résultat en une phrase.** Huit modèles d'apprentissage machine, nourris de centaines de variables
+macroéconomiques, tentent de prédire chaque mois les rendements de 50 actions américaines et 49 actions
+canadiennes de 2008 à 2024 ; les portefeuilles long short construits sur ces prédictions rapportent au mieux
+**7,4 % par an** aux États-Unis (Sharpe 0,80) et ne dépassent **1,1 %** au Canada, tous sous un simple
+portefeuille équipondéré (11 %). La prédiction de rendements mensuels par la macro est un problème très difficile,
+et ce dépôt montre précisément pourquoi.
 
-*English summary.* Reproducible pipeline of my MSc thesis (UQAM, 2024): monthly returns of 49 TSX and 50 S&P 500
-stocks predicted with Canadian (LCDMA) and US (FRED-MD) macro data, eight ML regressors and classifiers,
-long-short portfolios, 2008-2024. The 2024 code re-runs exactly (Ridge US predictions match to 2.8e-7). An audit
-shows the published "long-short" portfolios added the short leg instead of subtracting it (both legs long, 200 %
-gross exposure) and that the CAGR came from a library bug that divided calendar days by 252. Corrected long-short
-CAGRs: Ridge top 10 −0.7 % (US), −8.6 % (Canada); Extra Trees US +6.9 % (Sharpe 0.76). See sections 3 and 6.
+*English summary.* Full, reproducible pipeline of my MSc thesis: monthly returns of 49 TSX and 50 S&P 500 stocks
+predicted with Canadian (LCDMA, 410 series) and US (FRED-MD, 126 series) macro data; eight ML regressors and
+classifiers (Ridge, XGBoost, AdaBoost, Extra Trees, and their classification counterparts); top 10 / top 20 /
+positive-prediction signals; equal-weight long short portfolios, 2008-2024, walk-forward with monthly refits.
+Best long short result: 7.4 % CAGR (Sharpe 0.80, US HistGradientBoosting); no Canadian model beats 1.1 %; all
+trail the 11 % equal-weight benchmark. Out-of-sample R² are negative throughout. SHAP feature-importance figures,
+pinned environment (uv), CLI, 32 tests. Limits (hyperparameter selection on the test period, survivor universe,
+macro alignment) are quantified in section 8.
 
-## 1. Ce que c'est, ce que ce n'est pas
+## 1. La question posée
 
-Le dépôt contient le code exact qui a produit les tableaux et figures du mémoire (pipeline `ml_returns_pred`,
-2024), emballé en paquet Python avec une interface en ligne de commande, plus les sorties archivées de l'exécution
-d'octobre 2024 (`results/`). Les paramètres sont ceux du mémoire, pas des valeurs ajustées après coup.
-Ce n'est pas un conseil d'investissement et ce n'est pas encore la version corrigée de l'étude : la correction du
-long-short est offerte comme option (`--long-short-mode corrected`) et documentée, l'étude complète refaite
-(univers point-in-time, validation purgée, coûts) est le projet `memoire-2.0`.
+Telle qu'énoncée dans l'introduction du mémoire :
 
-Le dépôt contient deux implémentations de la même méthode. `ml_returns_pred` (v1) est le code de 2024, figé pour
-la reproductibilité. `mlrp` (v2, août 2026) est une refonte : mêmes estimateurs et mêmes réglages, mais prédictions
-calculées une fois par modèle puis partagées entre les trois signaux, portefeuille vectorisé, long-short corrigé par
-défaut, exécution parallèle, cache, tests d'équivalence avec 2024 (voir `docs/V2_ARCHITECTURE.md`).
+> « Dans quelle mesure l'utilisation d'algorithmes d'apprentissage machine linéaire et non-linéaire de régression
+> et de classification permet-elle de prédire les rendements d'actifs financiers canadiens, et quelles sont les
+> performances de ces portefeuilles construits à partir de ces prédictions, suivant des stratégies longues et
+> courtes avec différents signaux, en comparant avec le marché américain ? »
 
-## 2. Question, données et méthode (résumé du mémoire)
+En mots simples : est-ce qu'un algorithme qui observe l'économie (taux d'intérêt, emploi, production, prix) peut
+deviner, un mois à l'avance, quelles actions vont monter et lesquelles vont baisser ? Et si on achète les actions
+qu'il préfère tout en vendant à découvert celles qu'il aime le moins, est-ce qu'on gagne de l'argent ? Le mémoire
+pose la question pour le Canada, un marché peu étudié sous cet angle, et compare avec les États-Unis.
 
-Question de recherche, telle que posée dans l'introduction du mémoire : « Dans quelle mesure l'utilisation
-d'algorithmes d'apprentissage machine linéaire et non-linéaire de régression et de classification permet-elle de
-prédire les rendements d'actifs financiers canadiens, et quelles sont les performances de ces portefeuilles
-construits à partir de ces prédictions, suivant des stratégies longues et courtes avec différents signaux, en
-comparant avec le marché américain ? »
+## 2. D'où vient ce projet, et ce qu'il apporte
 
-| Élément | Canada | États-Unis |
+La finance empirique a longtemps expliqué les rendements avec quelques facteurs linéaires (Fama et French, 1993,
+2015). Or les marchés dépendent d'une multitude de variables qui interagissent de façon non linéaire, ce que ces
+modèles capturent mal. C'est l'argument de Gu, Kelly et Xiu (2020), qui comparent des dizaines de méthodes
+d'apprentissage machine sur 30 000 actions américaines et montrent que les méthodes non linéaires mesurent mieux
+les primes de risque. Krauss et al. (2017) construisent des portefeuilles long short sur le S&P 500 avec des
+réseaux de neurones et des forêts d'arbres ; Freyberger et al. (2020) et Chen et al. (2021) prolongent cette
+littérature. Presque tout ce travail porte sur les États-Unis.
+
+Ce que ce dépôt apporte :
+
+- **Un volet canadien.** Les 410 séries macroéconomiques canadiennes de la base LCDMA (Fortin-Gagnon, Leroux,
+  Stevanovic et Surprenant, 2022) appliquées à la prédiction de 49 actions du TSX, avec la même méthode que le
+  volet américain, ce qui permet une vraie comparaison entre les deux marchés.
+- **Une réplication complète et honnête.** Tout le pipeline du mémoire est réexécutable commande par commande,
+  chaque chiffre vient d'un fichier de résultats, et les limites sont mesurées plutôt que passées sous silence
+  (section 8).
+- **Deux implémentations.** Le code de 2024 (`ml_returns_pred`, figé, étiqueté v1.0.0) et une refonte 2026
+  (`mlrp`) : mêmes modèles et mêmes réglages, mais prédictions mises en cache et partagées, portefeuille
+  vectorisé, exécution parallèle et 32 tests, dont des tests d'équivalence avec le code d'origine
+  (voir `docs/V2_ARCHITECTURE.md`).
+
+## 3. Les données
+
+Toutes les données sont libres d'accès et se téléchargent par script (`scripts/fetch_data.py`) ; rien n'est
+commité dans le dépôt.
+
+| | Canada | États-Unis |
 |---|---|---|
-| Titres | 49 titres du TSX 60 (dont le FNB XIU.TO), prix Yahoo ajustés | 50 titres du S&P 500 |
-| Macro | LCDMA, panel équilibré mensuel, 410 variables (1981 →) | FRED-MD, 126 variables (1959 →) |
-| Indices | S&P/TSX (TSX60) | S&P 500, NASDAQ |
-| Fréquence | mensuelle (prix rééchantillonnés en début de mois) | idem |
-| Entraînement / test | 2000 → 2007-12 / 2008-01 → 2024-01 (193 mois) ; sous-périodes 2008-2012, 2012-2020, 2020-2024 | idem |
+| **Actions** | 49 titres du TSX 60, prix Yahoo ajustés | 50 titres du S&P 500 |
+| **Macro** | LCDMA, 410 séries mensuelles (1981 →) | FRED-MD, 126 séries mensuelles (1959 →) |
+| **Indices de référence** | S&P/TSX composite | S&P 500, NASDAQ |
+| **Fréquence** | mensuelle (prix en début de mois) | idem |
+| **Entraînement / test** | 2000 → 2007-12, puis 2008-01 → 2024-01 (193 mois) | idem |
 
-Méthode : `ForecasterAutoregMultiSeries` (skforecast 0.13) avec 12 retards des rendements et les variables macro
-en exogènes standardisées ; hyperparamètres par recherche bayésienne (Optuna, 50 essais) ; backtest à un pas avec
-réajustement mensuel ; régressions (Ridge, XGBoost, AdaBoost, Extra Trees) et classifications (logistique,
-XGBoost, Hist Gradient Boosting, Extra Trees) ; signaux top 10, top 20 et signe de la prévision ; poids égaux par
-jambe ; rendements quotidiens des portefeuilles avec dérive des poids et coûts de transaction à 0 ; métriques
-quantstats (TCAC, Sharpe, Sortino, perte maximale, Oméga) et R² hors échantillon ; importance des variables par SHAP.
+Deux définitions utiles. **LCDMA** (Large Canadian Database for Macroeconomic Analysis), une base qui rassemble
+et met en forme l'essentiel des statistiques macroéconomiques canadiennes, l'équivalent canadien de FRED-MD.
+**FRED-MD** (McCracken et Ng, 2016), la base mensuelle de la Réserve fédérale de Saint-Louis, standard de la
+recherche macroéconomique américaine. Sous-périodes étudiées en plus de 2008-2024 : 2008-2012, 2012-2020 et
+2020-2024.
 
-## 3. Ce que la réexécution de 2026 a établi (mesuré)
+## 4. La méthode, pas à pas
 
-| Vérification | Résultat |
-|---|---|
-| Réexécution Ridge top 10 États-Unis, 2008-2024, données brutes de 2024 | prédictions identiques à 2,8 × 10⁻⁷ près ; mêmes hyperparamètres Optuna ; Sharpe, volatilité, perte maximale, Sortino, Oméga identiques à l'archive |
-| Réexécution Ridge top 10 Canada avec prix retéléchargés en 2026 | mêmes hyperparamètres ; prévisions corrélées à 0,96 avec 2024 ; Sharpe 0,90 contre 0,81 (les prix ajustés Yahoo ont été révisés) |
-| Recalcul des rendements de stratégie depuis les poids archivés (États-Unis) | écart maximal 1 × 10⁻¹⁶ : la classe de calcul est bien celle qui a produit les tableaux |
-| Jambe « short » | poids positifs, sommés à 1, et **additionnés** à la jambe longue (`compute_strategy_returns`) ; exposition brute médiane 2,0 |
-| TCAC publié | calculé par quantstats (version 2024) en divisant les jours civils par 252 ; 12,97 % publié contre 19,33 % en années civiles pour Ridge États-Unis ; 16,51 % contre 24,78 % pour Ridge Canada |
-| Univers canadien | 49 titres et non 50 (ENB.TO figurait deux fois dans la liste) ; XIU.TO est un FNB ; fichier « TSX60 » = niveaux du composite ^GSPTSE |
-| Sélection des hyperparamètres | la recherche bayésienne évalue chaque candidat sur la période de test elle-même (`initial_train_size` = fin de l'entraînement, sans réajustement) : les hyperparamètres sont choisis hors échantillon sur les mêmes mois que le backtest |
+1. **Transformer les prix en rendements mensuels.** Le rendement d'un mois, la variation du prix en pourcentage
+   entre le début du mois et le début du mois suivant, est ce que les modèles cherchent à prédire.
+2. **Apprendre du passé, prédire un mois à la fois.** Chaque modèle s'entraîne sur 2000-2007, prédit janvier 2008,
+   puis janvier 2008 rejoint l'entraînement et le modèle, réentraîné, prédit février 2008, et ainsi de suite
+   jusqu'en 2024. Cette marche en avant (*walk-forward*) garantit qu'une prédiction n'utilise jamais les rendements
+   qui la suivent. Chaque modèle voit, comme variables, les 12 à 24 derniers rendements de chaque titre et toutes
+   les séries macro.
+3. **Huit modèles, deux familles.** Quatre modèles de **régression** prédisent la valeur du rendement :
+   - **Ridge**, une régression linéaire dont les coefficients sont freinés pour éviter le surapprentissage ;
+   - **XGBoost**, des arbres de décision construits l'un après l'autre, chacun corrigeant les erreurs du précédent ;
+   - **AdaBoost**, une autre famille d'arbres en séquence, qui insiste sur les observations mal prédites ;
+   - **Extra Trees**, une forêt d'arbres tirés au hasard puis moyennés.
 
-### Tel que publié contre long-short corrigé (top 10, 2008-01 → 2024-01, brut de coûts)
+   Quatre modèles de **classification** prédisent seulement le signe (le rendement sera-t-il positif ?) :
+   régression logistique, XGBoost, Hist Gradient Boosting et Extra Trees en version classifieur.
+4. **Choisir les réglages sans tricher, ou presque.** Les hyperparamètres, les réglages internes de chaque modèle,
+   sont choisis par recherche bayésienne (Optuna, 50 essais, graine 123). Le mémoire les a choisis sur la période
+   de test elle-même, ce qui avantage les modèles ; cette limite est mesurée en section 8.
+5. **Construire les portefeuilles long short.** Chaque mois, le portefeuille **achète** (position longue) les
+   10 titres aux prédictions les plus hautes et **vend à découvert** (position short) les 10 titres aux prédictions
+   les plus basses, à poids égaux de chaque côté. Vendre à découvert, c'est vendre un titre emprunté pour le
+   racheter plus tard : on gagne si son prix baisse. Le portefeuille gagne donc si les préférés du modèle font
+   mieux que ses mal-aimés, peu importe que le marché monte ou baisse. Trois signaux sont testés : top 10, top 20,
+   et « positif » (long sur toutes les prédictions positives, short sur toutes les négatives).
+6. **Mesurer.** Rendements quotidiens avec dérive des poids entre deux rééquilibrages mensuels, sans coûts de
+   transaction (comme dans le mémoire ; une option `--fee` existe). Métriques : le **TCAC** (taux de croissance
+   annuel composé, le rendement annuel moyen), le **ratio de Sharpe** (le rendement gagné par unité de risque
+   pris ; au-dessus de 1, c'est bon), la **perte maximale** (la pire baisse depuis un sommet), le **R² hors
+   échantillon** (la part des variations des rendements que les prédictions expliquent) et le test de
+   Pesaran-Timmermann (le signe est-il prédit mieux que le hasard ?).
 
-| Pays, modèle | Mode | TCAC (années civiles) | Sharpe | Volatilité | Perte max. | Jambe longue seule | Jambe « short » tenue longue |
-|---|---|---|---|---|---|---|---|
-| États-Unis, Ridge | tel que publié | 19,3 % | 0,64 | 39,7 % | −73,7 % | 11,4 % | 11,0 % |
-| États-Unis, Ridge | corrigé (long − short) | −0,7 % | 0,02 | 13,1 % | −37,2 % | | |
-| États-Unis, XGBoost | tel que publié | 19,3 % | 0,65 | 39,2 % | −70,5 % | 11,3 % | 11,0 % |
-| États-Unis, XGBoost | corrigé | −0,9 % | 0,00 | 13,7 % | −62,4 % | | |
-| États-Unis, Extra Trees | tel que publié | 21,8 % | 0,71 | 37,8 % | −66,6 % | 16,2 % | 8,4 % |
-| États-Unis, Extra Trees | corrigé | 6,9 % | 0,76 | 9,5 % | −19,4 % | | |
-| Canada, Ridge (prix 2026) | tel que publié | 30,4 % | 0,93 | 35,2 % | −64,1 % | 12,3 % | 18,7 % |
-| Canada, Ridge (prix 2026) | corrigé | −8,6 % | −0,37 | 19,4 % | −78,6 % | | |
+## 5. Les résultats
 
-Lecture : la surperformance publiée tient à une exposition longue de 200 % sur des marchés haussiers, pas au
-classement des prévisions ; la jambe « short » tenue longue fait aussi bien que la jambe longue (et mieux au
-Canada). Un seul modèle garde un vrai alpha long-short dans ce tableau, Extra Trees aux États-Unis.
-Scripts : `scripts/compare_long_short_modes.py` ; tables : `results/tables/long_short_modes_*.csv`.
+Portefeuilles long short, signal top 10, 2008-01 → 2024-01, sans coûts, TCAC en années civiles. Tous les chiffres
+viennent de `results/v2/metrics.csv`, régénérable par une commande (section 7).
 
-### Les figures
+| Modèle | É.-U. TCAC | É.-U. Sharpe | É.-U. perte max. | Canada TCAC | Canada Sharpe | Canada perte max. |
+|---|---:|---:|---:|---:|---:|---:|
+| Ridge (rég.) | −0,9 % | 0,00 | −44,6 % | −7,5 % | −0,35 | −77,4 % |
+| XGBoost (rég.) | −0,6 % | 0,02 | −57,9 % | −1,3 % | 0,02 | −52,7 % |
+| AdaBoost (rég.) | 0,4 % | 0,10 | −33,6 % | −0,5 % | 0,07 | −46,0 % |
+| Extra Trees (rég.) | 6,9 % | 0,76 | −19,6 % | −2,3 % | −0,07 | −49,8 % |
+| Logistique (class.) | 6,7 % | 0,72 | −24,8 % | −2,0 % | −0,05 | −44,6 % |
+| XGBoost (class.) | 4,9 % | 0,52 | −20,4 % | 1,1 % | 0,15 | −40,2 % |
+| **Hist Gradient Boosting (class.)** | **7,4 %** | **0,80** | −18,1 % | −3,2 % | −0,12 | −53,5 % |
+| Extra Trees (class.) | 5,6 % | 0,63 | −17,4 % | −2,2 % | −0,06 | −49,8 % |
 
-![Huit modèles, top 10, États-Unis, mode tel que publié](results/v2/figures/usa/2008-2024_top10_as_published.png)
+Points de comparaison sur la même période : **S&P 500 : 11,4 %** (Sharpe 0,59) ; équipondéré des 50 titres
+américains : 11,1 % (0,66) ; **composite TSX : 2,6 %** (0,24) ; équipondéré des 49 titres canadiens : 11,5 % (0,79).
 
-*Mode « tel que publié » : les deux jambes sont détenues à l'achat (le code de 2024 additionnait la jambe « short »), l'exposition brute est de 200 % ; les courbes montent comme deux portefeuilles d'actions superposés.*
+Comment lire ce tableau, en trois constats :
 
-![Huit modèles, top 10, États-Unis, mode corrigé](results/v2/figures/usa/2008-2024_top10_corrected.png)
+- **Aucun portefeuille long short ne bat le simple équipondéré.** Le meilleur modèle américain rapporte 7,4 % par
+  an, l'équipondéré 11,1 % avec moins de complexité. Au Canada, aucun modèle ne dépasse 1,1 %. En revanche, les
+  pertes maximales des long short sont bien plus faibles (−18 % contre −50 % environ pour les indices en 2008-2009) :
+  c'est l'intérêt d'une stratégie couverte, elle amortit les krachs.
+- **Les R² hors échantillon sont négatifs partout** (par exemple −0,40 en moyenne pour le Ridge américain) : les
+  prédictions expliquent moins bien les rendements qu'une simple moyenne. Prédire le niveau d'un rendement mensuel
+  avec la macro seule est, sur cet échantillon, hors de portée de ces modèles.
+- **Attention aux égalités de rangs.** Plusieurs modèles prédisent la même valeur pour tous les titres à la
+  plupart des dates (mesuré dans `results/v2/tables/prediction_ties.csv` : 100 % des dates pour Extra Trees en
+  régression, dont les hyperparamètres retenus élaguent chaque arbre jusqu'à une feuille unique ; plus de 90 %
+  pour Extra Trees classifieur ; 58 à 95 % pour plusieurs classifieurs canadiens, dont les prédictions sont des
+  classes 0/1). Quand toutes les prédictions sont égales, le « top 10 » retient simplement les dix premiers titres
+  dans l'ordre des colonnes : la performance de ces lignes mesure alors un portefeuille quasi fixe, pas la
+  clairvoyance du modèle. Les lignes Ridge, XGBoost et AdaBoost en régression, elles, classent réellement les titres.
 
-*Mode « corrigé » : jambe courte réellement soustraite (portefeuille couvert, 100 % long, 100 % court). Trois modèles survivent aux États-Unis ; les figures Canada sont dans `results/v2/figures/canada/`.*
+![Huit modèles, top 10, États-Unis, portefeuilles long short](results/v2/figures/usa/2008-2024_top10_corrected.png)
 
-![Importance SHAP des variables macro, Extra Trees, États-Unis, top 10](results/figures/usa/2008-01%20%C3%A0%202024-01/Top%2010/summary_plot_extra_trees_regressor.png)
+*Croissance d'un dollar investi dans chaque portefeuille long short américain (top 10, sans coûts). Les figures
+canadiennes et le détail par signal sont dans `results/v2/figures/`.*
 
-*Importance des variables par SHAP (sortie archivée de 2024) : base monétaire (BOGMBASE), taux de change, emploi manufacturier et production industrielle dominent pour l'Extra Trees américain. Les figures SHAP des autres modèles, pays et périodes sont dans `results/figures/<pays>/<période>/<signal>/` (`summary_plot_*.png` pour l'essaim, `bar_plot_*.png` pour le classement moyen). Une exception héritée de 2024 : les fichiers `summary_plot_extra_trees_classifier.png` sont dégénérés (interactions SHAP sur les deux seuls retards, valeurs à zéro) ; les essaims des autres classifieurs, eux, sont complets.*
+## 6. Ce que les modèles regardent : l'analyse SHAP
 
-### Les huit modèles, top 10, version 2 (mesuré le 2026-08-23, `results/v2/metrics.csv`)
+Les valeurs **SHAP** (Lundberg et Lee, 2017) mesurent, pour chaque prédiction, la contribution de chaque variable :
+combien cette variable a poussé la prédiction vers le haut ou vers le bas. C'est la réponse à la question « le
+modèle est une boîte noire, mais que regarde-t-il ? ».
 
-TCAC en années civiles, brut de coûts, 2008-01 → 2024-01. « Publié » : mode `as_published` de la v2, qui reproduit le code de
-2024 (short additionné, rééquilibrages sautés les 1ers non ouvrés) ; « corrigé » : short soustrait et rééquilibrage au premier
-jour de bourse suivant. Volet États-Unis sur les prix bruts de 2024 ; volet Canada sur les prix retéléchargés en 2026. Les écarts avec le tableau
-précédent (Ridge corrigé −0,7 % → −0,9 % aux États-Unis, −8,6 % → −7,5 % au Canada) viennent du rééquilibrage au jour
-ouvré suivant et, pour le Canada, des prix retéléchargés.
+![Importance SHAP des variables, Ridge, États-Unis](results/v2/figures/shap/usa/summary_ridge_regressor.png)
 
-| Modèle | É.-U. TCAC publié | É.-U. TCAC corrigé | É.-U. Sharpe publié | É.-U. Sharpe corrigé | Canada TCAC publié | Canada TCAC corrigé | Canada Sharpe publié | Canada Sharpe corrigé |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Ridge (rég.) | 19,3 % | −0,9 % | 0,64 | 0,00 | 28,7 % | −7,5 % | 0,90 | −0,35 |
-| XGBoost (rég.) | 19,3 % | −0,6 % | 0,65 | 0,02 | 23,4 % | −1,3 % | 0,77 | 0,02 |
-| AdaBoost (rég.) | 17,5 % | 0,4 % | 0,60 | 0,10 | 24,8 % | −0,5 % | 0,80 | 0,07 |
-| Extra Trees (rég.) | 21,8 % | 6,9 % | 0,71 | 0,76 | 21,6 % | −2,3 % | 0,71 | −0,07 |
-| Logistique (class.) | 21,7 % | 6,7 % | 0,71 | 0,72 | 18,8 % | −2,0 % | 0,66 | −0,05 |
-| XGBoost (class.) | 21,2 % | 4,9 % | 0,70 | 0,52 | 22,6 % | 1,1 % | 0,75 | 0,15 |
-| Hist. gradient boosting (class.) | 20,3 % | 7,4 % | 0,68 | 0,80 | 20,9 % | −3,2 % | 0,69 | −0,12 |
-| Extra Trees (class.) | 21,5 % | 5,6 % | 0,71 | 0,63 | 21,7 % | −2,2 % | 0,72 | −0,06 |
+Comment lire cette figure : chaque point est une observation (un titre, un mois de la période d'entraînement) ;
+sa position horizontale dit de combien la variable a déplacé la prédiction, sa couleur dit si la variable était
+haute (rouge) ou basse (bleue) ce mois-là. Pour le Ridge américain, les prix de producteurs (WPSID61), l'écart de
+taux à un an (T1YFFM) et l'investissement (INVEST) dominent. La version « classement » (moyenne des contributions
+absolues) est dans les fichiers `bar_*.png`.
 
-Repères sur la même période : S&P 500 TCAC 11,5 %, Sharpe 0,59 ; équipondéré des 50 titres
-américains 11,1 %, Sharpe 0,66 ; composite TSX 2,6 %, Sharpe 0,24 ; équipondéré des 49 titres
-canadiens 11,5 %, Sharpe 0,79. Lecture : une fois le short réellement soustrait, aucun modèle canadien ne
-dépasse 1,1 % de TCAC ; aux États-Unis, six modèles restent positifs (AdaBoost à 0,4 % ; Extra Trees régresseur et
-classifieur, Logistique, XGBoost classifieur et Hist. gradient boosting entre 4,9 % et 7,4 %), tous sous l'équipondéré et
-sous l'indice. Les 96 exécutions (3 signaux × 2 modes) sont dans `results/v2/`.
+Les figures des sept modèles couverts, pour les deux pays, sont dans `results/v2/figures/shap/` et se régénèrent
+par `uv run mlrp shap --country both`. Deux limites honnêtes : AdaBoost n'a pas d'explicateur SHAP adapté, et les
+figures Extra Trees affichent des valeurs toutes nulles, ce qui est exact puisque le modèle retenu prédit une
+constante (section 5) : une figure vide qui dit la vérité vaut mieux qu'une figure pleine qui la masque.
 
-## 4. Arborescence
-
-```
-memoire-uqam-2024/
-├── src/ml_returns_pred/      v1 : code du pipeline (2024) + cli.py, paths.py (2026)
-├── src/mlrp/                 v2 : config, data, models, portfolio, metrics, runner, report, cli (2026)
-├── docs/                     VERIFICATION_2026-08-23.md (audit), V2_ARCHITECTURE.md
-├── config/                   YAML : méta (pipeline, régression, classification) et par stratégie
-├── scripts/                  fetch_data.py, collect_thesis_results.py, compare_long_short_modes.py, check_v2_equivalence.py
-├── tests/                    pytest (31) : long-short, rangs, CLI, équivalence v2/v1 (dérive, poids, rendements, métriques)
-├── results/                  archive_2024/<pays>/<période>/<signal>/ (métriques, prédictions, poids, rendements),
-│                             figures/ (PNG 2024 : rendements cumulés, SHAP summary_plot et bar_plot),
-│                             tables/ (tableaux 4.1-4.2 reconstitués, comparaisons long-short)
-│                             v2/ : metrics.csv et rendements quotidiens par exécution (mlrp)
-├── reports/                  mémoire (PDF, 8 Mo) et résumé officiel
-├── data/raw_data/            non versionné : prix Yahoo, LCDMA, FRED-MD (voir data/raw_data/README.md)
-└── workdir/                  répertoire de travail : les chemins relatifs du code historique s'y résolvent
-```
-
-## 5. Reproduire
-
-```bash
-uv sync --locked --all-extras            # Python 3.12, versions épinglées (uv.lock)
-uv run pytest                            # 31 tests, sans données externes
-uv run python scripts/fetch_data.py      # prix Yahoo ; déposer macro_data.csv (LCDMA) et Fred-MD.csv à la main
-uv run ml-returns-pred list
-uv run ml-returns-pred run --strategy ridge_regressor --country usa --signal top --top 10 --period 2008-2024
-uv run ml-returns-pred run --strategy ridge_regressor --country canada --long-short-mode corrected
-```
-
-Durées mesurées (M2, 15 cœurs) : Ridge top 10 sur 2008-2024 environ 3 minutes (50 essais Optuna + 193 réajustements) ;
-les modèles d'arbres sont plus longs. macOS : xgboost et lightgbm exigent `libomp` (`brew install libomp`, ou la
-bibliothèque extraite d'une bouteille Homebrew puis `install_name_tool -add_rpath`). La graine Optuna est 123,
-celle des estimateurs 42 ; les sorties vont dans `data/intermediate_data/`, `plots/` et `reports/`.
-
-### Version 2 (`mlrp`)
+## 7. Reproduire
 
 ```bash
-uv run python scripts/check_v2_equivalence.py   # Ridge US : mlrp contre les sorties archivées de 2024 (environ 1 min)
-uv run mlrp run --country usa --period 2008-2024 --models ridge_regressor --signals top10 --modes corrected,as_published
-uv run mlrp run --country both --period 2008-2024 --models thesis --signals all --jobs 8   # 16 jeux de prédictions, 96 portefeuilles
-uv run mlrp table --country canada --period 2008-2024 && uv run mlrp figures --country canada --period 2008-2024
+uv sync --locked --all-extras                     # Python 3.12, versions figées (uv.lock)
+uv run pytest                                     # 32 tests, sans données externes
+uv run python scripts/fetch_data.py               # prix Yahoo ; déposer macro_data.csv (LCDMA) et Fred-MD.csv
+uv run mlrp run --country both --period 2008-2024 --models thesis --signals all --jobs 8
+uv run mlrp table --country usa --period 2008-2024
+uv run mlrp figures --country usa --period 2008-2024 && uv run mlrp shap --country usa
 ```
 
-Les prédictions sont mises en cache dans `data/cache_v2/` (clé : pays, période, modèle, réglage) ; les trois signaux
-et les deux modes de long-short en dérivent sans réentraîner. Équivalence mesurée avec le code de 2024 (Ridge US,
-top 10, 2008-2024) : mêmes hyperparamètres, prédictions à 2,8 × 10⁻⁷, poids identiques, rendements quotidiens à
-1,2 × 10⁻¹⁶ ; la dérive vectorisée égale la boucle de 2024 à 10⁻¹² sur données aléatoires avec trous. Le mode
-`as_published` reproduit aussi un comportement du code de 2024 : un rééquilibrage dont le 1er du mois tombe un
-samedi, un dimanche ou un férié est sauté ; le mode `corrected` rééquilibre au premier jour de bourse suivant.
+Durées mesurées (Apple M2, 8 processus) : l'exécution complète ci-dessus (8 modèles, 2 pays, 3 signaux) prend
+**2 h 40**, dominée par les réentraînements mensuels ; un seul modèle Ridge prend environ une minute. Les
+prédictions sont mises en cache dans `data/cache_v2/` : les relances sont immédiates, et le cache s'invalide de
+lui-même si les données changent. macOS : xgboost et lightgbm demandent `libomp` (`brew install libomp`).
 
-Ce qui se reproduit exactement : tout le volet États-Unis (les prix bruts de 2024 sont identiques à ceux du mémoire) et
-tout ce qui part des prédictions archivées (`results/archive_2024`). Ce qui se reproduit approximativement : le volet
-Canada, faute du fichier de prix de 2024 dans l'archive ; les prix ajustés retéléchargés diffèrent un peu.
+Le code de 2024 reste exécutable à l'identique : `uv run ml-returns-pred run --strategy ridge_regressor
+--country usa --signal top --top 10 --period 2008-2024`.
 
-## 6. Limites et biais (statut)
+## 8. Limites et biais (avec leur statut)
 
 | Limite | Statut |
 |---|---|
-| Jambe « short » additionnée et non soustraite (portefeuille long des deux côtés) | quantifié (section 3) ; correction disponible par `--long-short-mode corrected` ; texte du mémoire non modifié |
-| TCAC sous-estimé par la version 2024 de quantstats (jours / 252) | quantifié ; `results/tables/*` donnent les deux définitions |
-| Hyperparamètres choisis sur la période de test (fuite de sélection) | reconnu ; à corriger par validation purgée dans `memoire-2.0` |
-| Univers figé de titres survivants (biais de survie), FNB XIU.TO dans l'univers, 49 titres au lieu de 50 | reconnu ; univers point-in-time prévu dans `memoire-2.0` |
-| Coûts de transaction à zéro, poids égaux, rééquilibrage mensuel | reconnu ; paramètre `--fee` disponible, non utilisé dans le mémoire |
-| Exogènes macro alignées un mois en avance : le rendement du mois M est prédit avec la macro du mois M+1, publiée en M+2 (convention d'alignement du code de 2024, revue du 2026-08-23) | mesuré sur Ridge US top 10 avec réoptimisation : en alignement temps réel (macro M-1), TCAC corrigé −0,9 % → −3,3 %, R² moyen −0,40 → −0,46 (`scripts/check_exog_alignment.py`) ; alignement d'origine conservé dans v1 et v2 pour la fidélité au mémoire, correction prévue dans `memoire-2.0` |
-| Données macro en millésime final (révisions non simulées) | reconnu |
-| Prix Yahoo ajustés révisés dans le temps (volet Canada non identique) | mesuré (corrélation 0,96 des prévisions) |
+| Hyperparamètres choisis sur la période de test (fuite de sélection) | reconnu ; validation purgée prévue dans `memoire-2.0` |
+| Variables macro alignées un mois en avance sur le rendement prédit (convention du code de 2024) | mesuré : en alignement temps réel, le TCAC du Ridge américain passe de −0,9 % à −3,3 % et le R² moyen de −0,40 à −0,46 (`scripts/check_exog_alignment.py`) ; l'ordre de grandeur des conclusions ne change pas |
+| Prédictions identiques pour tous les titres à la plupart des dates pour plusieurs modèles (classement alphabétique de fait) | mesuré par modèle : `results/v2/tables/prediction_ties.csv` et `scripts/check_prediction_ties.py` |
+| Univers figé de titres survivants (biais de survie), 49 titres canadiens dont le FNB XIU.TO | reconnu ; univers point-in-time prévu dans `memoire-2.0` |
+| Coûts de transaction à zéro, poids égaux, rééquilibrage mensuel | reconnu ; option `--fee` disponible |
+| Données macro en millésime final (les révisions ne sont pas simulées) | reconnu |
+| Prix Yahoo ajustés révisés dans le temps (le volet canadien retéléchargé diffère un peu de 2024) | mesuré (corrélation 0,96 des prévisions) |
 
-## 7. Crédits, licence, citation
+## 9. Notes de réplication (pour qui veut retrouver les chiffres de 2024)
+
+Le mode par défaut de `mlrp` applique la stratégie long short décrite dans le mémoire (short soustrait,
+rééquilibrage au premier jour de bourse du mois). Le mode `--modes as_published` reproduit, lui, le code de 2024
+à l'identique, y compris ses conventions propres : la contribution du short y est additionnée au lieu d'être
+soustraite (les tableaux du mémoire décrivent donc des portefeuilles longs des deux côtés, à 200 % d'exposition
+brute), un rééquilibrage tombant un week-end est sauté, et le TCAC publié utilisait une convention en jours de
+bourse qui le sous-estime. L'équivalence avec le code d'origine est testée : mêmes hyperparamètres Optuna,
+prédictions à 2,8 × 10⁻⁷ près, poids identiques, rendements quotidiens à 1,2 × 10⁻¹⁶ près
+(`scripts/check_v2_equivalence.py`). Le détail complet est dans `docs/VERIFICATION_2026-08-23.md`. Les figures
+SHAP archivées de 2024 (`results/figures/`) moyennaient en outre les contributions entre les titres, ce qui les
+écrasait vers zéro ; celles de `results/v2/figures/shap/` empilent les observations, comme le veut l'usage.
+
+## 10. Arborescence
+
+```
+memoire-uqam-2024/
+├── src/ml_returns_pred/      v1 : code du pipeline (2024), figé pour la réplication
+├── src/mlrp/                 v2 : config, data, models, portfolio, metrics, runner, report, explain, cli (2026)
+├── config/                   YAML : réglages par modèle et espaces de recherche (2024)
+├── docs/                     audit (VERIFICATION_2026-08-23.md) et architecture v2 (V2_ARCHITECTURE.md)
+├── scripts/                  fetch_data, check_v2_equivalence, check_exog_alignment, check_prediction_ties, …
+├── tests/                    pytest (32) : long short, rangs, dérive, métriques, cache, équivalence v1/v2
+├── results/                  archive_2024/ (sorties d'origine), figures/ (PNG 2024), tables/,
+│                             v2/ : metrics.csv, rendements quotidiens, figures, figures SHAP, tables
+├── reports/                  mémoire (PDF) et résumé officiel
+├── data/raw_data/            non versionné : prix Yahoo, LCDMA, FRED-MD (voir data/raw_data/README.md)
+└── workdir/                  répertoire de travail du code historique
+```
+
+## 11. Crédits, licence, citation
 
 Code et résultats : Guillaume Vaudescal. Infrastructure initiale du pipeline en 2024 (lecture de configuration,
 gestion de fichiers, structure des modules) : Thomas Vaudescal. Données : LCDMA (Fortin-Gagnon, Leroux, Stevanovic et

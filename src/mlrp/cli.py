@@ -55,6 +55,25 @@ def cmd_figures(args) -> int:
     return 0
 
 
+def cmd_shap(args) -> int:
+    from mlrp.explain import EXPLAINABLE, shap_figures
+    from mlrp.runner import get_dataset
+
+    countries = ["canada", "usa"] if args.country == "both" else [args.country]
+    models = list(EXPLAINABLE) if args.models == "all" else args.models.split(",")
+    for country in countries:
+        spec0 = RunSpec(country=country, period=args.period, model=models[0], signal="top10")
+        ds = get_dataset(spec0)
+        for model in models:
+            if model not in EXPLAINABLE:
+                print(f"{model} : pas d'explicateur SHAP adapté (ignoré)")
+                continue
+            spec = RunSpec(country=country, period=args.period, model=model, signal="top10")
+            for p in shap_figures(spec, dataset=ds):
+                print(p)
+    return 0
+
+
 def cmd_table(args) -> int:
     import pandas as pd
 
@@ -95,6 +114,12 @@ def build_parser() -> argparse.ArgumentParser:
     f.add_argument("--country", default="canada")
     f.add_argument("--period", default="2008-2024")
     f.set_defaults(func=cmd_figures)
+
+    sh = sub.add_parser("shap", help="figures SHAP (essaim et classement) par pays et modèle")
+    sh.add_argument("--country", default="canada", choices=["canada", "usa", "both"])
+    sh.add_argument("--period", default="2008-2024", choices=list(PERIODS))
+    sh.add_argument("--models", default="all", help="liste séparée par des virgules, ou 'all'")
+    sh.set_defaults(func=cmd_shap)
 
     tb = sub.add_parser("table", help="table modèles x modes en markdown")
     tb.add_argument("--country", default="canada")

@@ -96,6 +96,27 @@ mise en place, « pooling » du R² robuste aux NaN, filtres d'avertissements ci
 reste à plat au lieu de sortir). Constats conservés tels quels et documentés : jambe short au seuil global de
 rangs (sans effet avec un univers constant), départage alphabétique du top 10 des classifieurs (hérité de 2024).
 
+## 5 ter. SHAP et prédictions constantes (2026-08-23, soir)
+
+Trois constats mesurés en régénérant les figures SHAP (`mlrp shap`, module `mlrp/explain.py`) :
+
+1. **Les figures SHAP archivées de 2024 moyennaient les contributions entre les titres**, position par position ;
+   deux effets de signes opposés s'annulaient et plusieurs figures (volet canadien surtout) s'écrasaient vers
+   zéro. La v2 empile les observations (titre, mois) au lieu de les moyenner, et garde la colonne du niveau
+   skforecast pendant le calcul (l'écarter décale l'attribution des variables).
+2. **Le module d'explicabilité de 2024 réajustait le modèle avec les hyperparamètres par défaut**, pas ceux
+   retenus par la recherche bayésienne ; ses figures ne décrivent donc pas les modèles qui ont produit les
+   portefeuilles. La v2 relit les hyperparamètres retenus dans le cache de prédictions.
+3. **Plusieurs modèles retenus prédisent une constante.** Le ccp_alpha des Extra Trees (0,42 à 0,48 retenu, 0,5
+   dans le YAML de base, contre 0,0 par défaut dans scikit-learn) élague chaque arbre jusqu'à une feuille unique :
+   la forêt prédit la même valeur pour tous les titres à toutes les dates (vérifié : 1 nœud, profondeur 0,
+   variance nulle des prédictions). Les classifieurs livrent des classes 0/1, identiques pour tous les titres à
+   la plupart des dates. Part des dates à prédictions toutes égales (`results/v2/tables/prediction_ties.csv`,
+   script `check_prediction_ties.py`) : Extra Trees régression 100 % (deux pays) ; Extra Trees classifieur 94 %
+   (É.-U.) et 99 % (Canada) ; Hist Gradient Boosting Canada 95 % ; logistique 69 à 73 % ; XGBoost classifieur
+   2 % (É.-U.) et 58 % (Canada). À ces dates, le « top 10 » se réduit à l'ordre des colonnes (alphabétique) ;
+   les SHAP nuls des Extra Trees sont donc exacts. Ridge, XGBoost et AdaBoost en régression classent réellement.
+
 ## 6. Ce que la v2 ne change pas (encore)
 
 La sélection des hyperparamètres sur la période de test, l'univers figé de titres survivants, l'absence de

@@ -74,3 +74,12 @@ Revue indépendante avec recalculs (détail dans `V2_ARCHITECTURE.md`, section 5
 exacte ; quatrième biais méthodologique identifié et mesuré, hérité de 2024 : exogènes macro un mois en avance
 sur le rendement prédit (Ridge US top 10 en alignement temps réel : TCAC corrigé −0,9 % → −3,3 %, R² moyen
 −0,40 → −0,46, `scripts/check_exog_alignment.py`). Ajouté à la table des limites du README.
+
+## Addendum du 2026-08-23 (soir) : prédictions constantes et figures SHAP
+
+Cinquième constat, mesuré (`scripts/check_prediction_ties.py`) : plusieurs modèles retenus prédisent la même
+valeur pour tous les titres à la plupart des dates (Extra Trees régression : 100 % des dates, ses arbres étant
+élagués à une feuille par un ccp_alpha de 0,42 à 0,5 ; classifieurs : classes 0/1 souvent unanimes). Le « top
+10 » de ces modèles se réduit alors à l'ordre des colonnes. Les figures SHAP de 2024 moyennaient par ailleurs
+les contributions entre titres et expliquaient des modèles aux hyperparamètres par défaut ; figures refaites
+dans `results/v2/figures/shap/` (détail : `V2_ARCHITECTURE.md`, section 5 ter).

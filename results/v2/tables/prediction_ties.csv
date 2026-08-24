@@ -1,0 +1,17 @@
+country,model,ccp_alpha_base,ccp_alpha_retenu,std_transversale_mediane,part_dates_predictions_identiques,n_dates
+usa,ridge_regressor,,,0.0013448031659902403,0.0,193
+usa,xgboost_regressor,,,0.007333117056661135,0.0,193
+usa,ada_boost_regressor,,,0.008508752418523701,0.0,193
+usa,extra_trees_regressor,0.5,0.42083499845635813,0.0,1.0,193
+usa,logistic_regression_classifier,,,0.0,0.7254,193
+usa,xgboost_classifier,,,0.4314191105869,0.0155,193
+usa,hist_gradient_boosting_classifier,,,0.32826072265931594,0.1503,193
+usa,extra_trees_classifier,0.2,0.0004176165965049997,0.0,0.943,193
+canada,ridge_regressor,,,0.000778498135549099,0.0,193
+canada,xgboost_regressor,,,0.021377066812859016,0.0,193
+canada,ada_boost_regressor,,,0.016865283472000357,0.0,193
+canada,extra_trees_regressor,0.5,0.48437427034097263,0.0,1.0,193
+canada,logistic_regression_classifier,,,0.0,0.6943,193
+canada,xgboost_classifier,,,0.0,0.5803,193
+canada,hist_gradient_boosting_classifier,,,0.0,0.9534,193
+canada,extra_trees_classifier,0.2,0.001838817969460449,0.0,0.9948,193
