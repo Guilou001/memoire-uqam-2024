@@ -146,8 +146,10 @@ def run_many(specs: list[RunSpec], n_jobs: int = 1, raw_dir: Path = RAW_DIR, cac
     rows = []
     for s in specs:
         res = run(s, raw_dir, cache_dir, n_jobs=1)
+        tuning_label = "none" if not s.tuning.tune else f"bayes{s.tuning.n_trials}" + (
+            "+best" if s.tuning.select_best else "")
         row = {"country": s.country, "period": s.period, "model": s.model, "signal": s.signal,
-               "mode": s.long_short_mode, "fee": s.fee, **res.performance.to_dict(),
+               "mode": s.long_short_mode, "fee": s.fee, "tuning": tuning_label, **res.performance.to_dict(),
                "bench_CAGR": res.benchmark["CAGR"], "bench_Sharpe": res.benchmark["Sharpe"],
                "ew_CAGR": res.equal_weight["CAGR"], "ew_Sharpe": res.equal_weight["Sharpe"],
                "r2_oos_average": None if res.r2_levels is None else res.r2_levels.get("average"),
@@ -163,7 +165,10 @@ def run_many(specs: list[RunSpec], n_jobs: int = 1, raw_dir: Path = RAW_DIR, cac
     path = results_dir / "metrics.csv"
     if path.exists():
         old = pd.read_csv(path)
-        keys = ["country", "period", "model", "signal", "mode", "fee"]
+        if "tuning" not in old.columns:  # CSV antérieurs au 2026-08-28 : produits avec le réglage par défaut
+            old["tuning"] = "bayes50"
+        # le réglage de tuning fait partie de la clé : un run --no-tuning n'écrase plus la ligne tunée
+        keys = ["country", "period", "model", "signal", "mode", "fee", "tuning"]
         table = pd.concat([old, table]).drop_duplicates(subset=keys, keep="last")
     table.to_csv(path, index=False)
     return table

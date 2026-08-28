@@ -22,7 +22,7 @@ import matplotlib
 import numpy as np
 import pandas as pd
 
-from mlrp.config import CACHE_DIR, RAW_DIR, RESULTS_DIR, RunSpec
+from mlrp.config import CACHE_DIR, COUNTRY_LABELS, MODEL_LABELS, RAW_DIR, RESULTS_DIR, RunSpec
 from mlrp.data import binarize, build_dataset
 from mlrp.models import make_forecaster, split_index
 
@@ -111,7 +111,8 @@ def shap_figures(spec: RunSpec, out_dir: Path = RESULTS_DIR / "figures" / "shap"
         shap.summary_plot(shap_values=shap_df.values, features=x_df, plot_type=plot_type,
                           max_display=max_display, show=False)
         fig = plt.gcf()
-        fig.suptitle(f"{spec.country} — {spec.model} — entraînement 2000-2007", fontsize=9, y=1.0)
+        fig.suptitle(f"{COUNTRY_LABELS.get(spec.country, spec.country)}, "
+                     f"{MODEL_LABELS.get(spec.model, spec.model)}, entraînement 2000-2007", fontsize=9, y=1.0)
         out = out_dir / f"{suffix}_{spec.model}.png"
         fig.savefig(out, dpi=160, bbox_inches="tight")
         plt.close(fig)

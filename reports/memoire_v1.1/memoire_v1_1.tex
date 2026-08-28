@@ -1,4 +1,4 @@
-% Mémoire v1.1 : mise à jour des résultats (2026-08-24)
+% Mémoire v1.1 : mise à jour des résultats (2026-08-24, complétée le 2026-08-28)
 % Compilé avec tectonic ; tableaux générés par scripts/make_latex_tables.py, figures par mlrp figures / mlrp shap.
 \documentclass[11pt]{article}
 \usepackage[T1]{fontenc}
@@ -19,7 +19,7 @@
 \large Version 1.1 : résultats mis à jour\\
 \normalsize Mise à jour du mémoire de maîtrise (UQAM, décembre 2024)}
 \author{Guillaume Vaudescal}
-\date{24 août 2026}
+\date{28 août 2026}
 
 \begin{document}
 \maketitle
@@ -42,12 +42,22 @@ tous les tableaux et toutes les figures avec le pipeline vérifié de 2026
   doublon (ENB.TO) et un FNB (XIU.TO) ; CNQ.TO (Canadian Natural Resources) et GIB-A.TO (CGI) les remplacent.
   \item \textbf{Un rééquilibrage dont le 1\textsuperscript{er} du mois n'est pas un jour de bourse est appliqué
   au jour de bourse suivant} (le code de 2024 le sautait).
+  \item \textbf{L'indice de référence américain est le S\&P 500.} Le pipeline de 2024 chargeait les niveaux du
+  NASDAQ composite sous l'étiquette « S\&P 500 » : sur 2008-2024, l'indice affiché rendait 11,5~\% par an
+  (Sharpe 0,59) quand le S\&P 500 rend 7,6~\% (Sharpe 0,46). Les lignes « Indice » des tableaux utilisent
+  désormais le S\&P 500.
+  \item \textbf{Le portefeuille équipondéré de référence détient dès son premier mois.} Le calcul antérieur le
+  faisait débuter un mois trop tard : son TCAC 2008-2024 passe de 11,1 à 10,8~\% aux États-Unis (Sharpe 0,66 à
+  0,64) et de 11,9 à 11,5~\% au Canada (Sharpe 0,80 à 0,78).
 \end{enumerate}
 
-Deux limites connues restent volontairement en l'état pour préserver la comparabilité avec le mémoire, et sont
-mesurées dans le dépôt : les hyperparamètres sont choisis sur la période de test, et les variables
-macroéconomiques sont alignées un mois en avance sur le rendement prédit. Leur correction est le chantier de la
-version~2. Enfin, plusieurs modèles produisent des prédictions identiques pour tous les titres à la plupart des
+Trois limites connues restent volontairement en l'état pour préserver la comparabilité avec le mémoire, et sont
+mesurées dans le dépôt : les hyperparamètres sont choisis sur la période de test ; les variables
+macroéconomiques sont alignées un mois en avance sur le rendement prédit ; et, pour les régresseurs, la
+sélection retient l'essai le moins bon de la recherche bayésienne au sens du $R^2$ (l'outil de recherche trie
+ses essais en ordre croissant et le pipeline de 2024 prenait la première ligne), ce qui bride les régresseurs
+face aux classifieurs (correction disponible par l'option \texttt{--select-best}). Leur correction est le
+chantier de la version~2. Enfin, plusieurs modèles produisent des prédictions identiques pour tous les titres à la plupart des
 dates (Extra Trees en tête, dont l'élagage retenu réduit chaque arbre à une feuille) ; leurs lignes mesurent
 alors un portefeuille quasi fixe et non un classement, ce que le lecteur doit garder en tête.
 

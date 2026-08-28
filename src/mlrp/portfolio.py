@@ -169,9 +169,13 @@ def strategy_returns(long_target: pd.DataFrame, short_target: pd.DataFrame | Non
 
 def equally_weighted_long_only(returns_monthly: pd.DataFrame, prices_daily: pd.DataFrame, start: str | None = None,
                                fee: float = 0.0) -> StrategyResult:
-    """Portefeuille de référence : tous les titres disponibles, poids égaux, rééquilibré chaque mois."""
+    """Portefeuille de référence : tous les titres disponibles, poids égaux, rééquilibré chaque mois.
+
+    ``start`` est ramené au début de son mois : l'appelant passe souvent un jour de bourse (2008-01-02) et,
+    sans cette normalisation, ``mask.loc[start:]`` sur l'index mensuel supprimerait le premier mois détenu.
+    """
     mask = returns_monthly.notna()
     if start is not None:
-        mask = mask.loc[pd.Timestamp(start):]
+        mask = mask.loc[pd.Timestamp(start).to_period("M").to_timestamp():]
     target = equal_weights(mask)
     return strategy_returns(target, None, prices_daily, mode="corrected", fee=fee)

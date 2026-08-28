@@ -2,7 +2,7 @@
 
 Pipeline complet de mon mémoire de maîtrise, *Évaluation empirique d'actifs canadiens par l'apprentissage
 automatique* (Guillaume Vaudescal, UQAM, décembre 2024, dir. Philippe Goulet Coulombe et Dalibor Stevanovic),
-rendu reproductible en 2026 : environnement figé, ligne de commande, 32 tests, résultats et figures régénérables
+rendu reproductible en 2026 : environnement figé, ligne de commande, 35 tests, résultats et figures régénérables
 à l'identique. Le mémoire complet (PDF, 96 pages) est dans [`reports/`](reports/).
 
 [![ci](https://github.com/Guilou001/memoire-uqam-2024/actions/workflows/ci.yml/badge.svg)](https://github.com/Guilou001/memoire-uqam-2024/actions/workflows/ci.yml)
@@ -12,19 +12,22 @@ rendu reproductible en 2026 : environnement figé, ligne de commande, 32 tests, 
 
 **Résultat en une phrase.** Huit modèles d'apprentissage machine, nourris de centaines de variables
 macroéconomiques, tentent de prédire chaque mois les rendements de 50 actions américaines et 50 actions
-canadiennes de 2008 à 2024 ; les portefeuilles long short construits sur ces prédictions rapportent au mieux
-**7,4 % par an** aux États-Unis (Sharpe 0,80) et **5,6 %** au Canada (Sharpe 0,40), tous sous un simple
-portefeuille équipondéré (11 à 12 %). La prédiction de rendements mensuels par la macro est un problème très difficile,
-et ce dépôt montre précisément pourquoi.
+canadiennes de 2008 à 2024 ; les portefeuilles long short construits sur ces prédictions, achat des titres
+les mieux classés et pari sur la baisse des moins bien classés, rapportent au mieux **7,4 % par an** aux
+États-Unis et **5,6 %** au Canada (ratios de Sharpe 0,80 et 0,39, le rendement gagné par unité de risque
+pris), tous sous un simple portefeuille équipondéré, la même somme placée sur chaque titre (10,8 et 11,5 %).
+La prédiction de rendements mensuels par la macro est un problème très difficile, et ce dépôt montre
+précisément pourquoi.
 
 *English summary.* Full, reproducible pipeline of my MSc thesis: monthly returns of 50 TSX and 50 S&P 500 stocks
 predicted with Canadian (LCDMA, 410 series) and US (FRED-MD, 126 series) macro data; eight ML regressors and
 classifiers (Ridge, XGBoost, AdaBoost, Extra Trees, and their classification counterparts); top 10 / top 20 /
 positive-prediction signals; equal-weight long short portfolios, 2008-2024, walk-forward with monthly refits.
 Best long short result: 7.4 % CAGR (Sharpe 0.80, US HistGradientBoosting) and 5.6 % in Canada (XGBoost); all
-trail the 11-12 % equal-weight benchmark. Out-of-sample R² are negative throughout. SHAP feature-importance figures,
-pinned environment (uv), CLI, 32 tests. Limits (hyperparameter selection on the test period, survivor universe,
-macro alignment) are quantified in section 8.
+trail the 10.8-11.5 % equal-weight benchmark. Out-of-sample R² are negative or at best near zero. SHAP
+feature-importance figures, pinned environment (uv), CLI, 35 tests. Limits (hyperparameter selection on the
+test period, anti-optimal trial retained for regressors, survivor universe, macro alignment) are quantified
+in section 8.
 
 ## 1. La question posée
 
@@ -52,15 +55,17 @@ littérature. Presque tout ce travail porte sur les États-Unis.
 
 Ce que ce dépôt apporte :
 
-- **Un volet canadien.** Les 410 séries macroéconomiques canadiennes de la base LCDMA (Fortin-Gagnon, Leroux,
-  Stevanovic et Surprenant, 2022) appliquées à la prédiction de 50 actions du TSX, avec la même méthode que le
-  volet américain, ce qui permet une vraie comparaison entre les deux marchés.
+- **Un volet canadien.** Les 410 séries macroéconomiques canadiennes de la base **LCDMA** (Large Canadian
+  Database for Macroeconomic Analysis), le recueil qui rassemble et met en forme l'essentiel des statistiques
+  macroéconomiques du Canada (Fortin-Gagnon, Leroux, Stevanovic et Surprenant, 2022), appliquées à la
+  prédiction de 50 actions du TSX, avec la même méthode que le volet américain, ce qui permet une vraie
+  comparaison entre les deux marchés.
 - **Une réplication complète et honnête.** Tout le pipeline du mémoire est réexécutable commande par commande,
   chaque chiffre vient d'un fichier de résultats, et les limites sont mesurées plutôt que passées sous silence
   (section 8).
 - **Deux implémentations.** Le code de 2024 (`ml_returns_pred`, figé, étiqueté v1.0.0) et une refonte 2026
   (`mlrp`) : mêmes modèles et mêmes réglages, mais prédictions mises en cache et partagées, portefeuille
-  vectorisé, exécution parallèle et 32 tests, dont des tests d'équivalence avec le code d'origine
+  vectorisé, exécution parallèle et 35 tests, dont des tests d'équivalence avec le code d'origine
   (voir `docs/V2_ARCHITECTURE.md`).
 
 ## 3. Les données
@@ -70,17 +75,15 @@ commité dans le dépôt.
 
 | | Canada | États-Unis |
 |---|---|---|
-| **Actions** | 50 titres du TSX (depuis la v1.1 : CNQ et CGI remplacent le doublon ENB et le FNB XIU de 2024), prix Yahoo ajustés | 50 titres du S&P 500 |
+| **Actions** | 50 titres du TSX (depuis la v1.1 : CNQ et CGI remplacent le doublon ENB et le FNB XIU de 2024, un FNB étant un fonds négocié en bourse, un panier de titres coté comme une action), prix Yahoo ajustés | 50 titres du S&P 500 |
 | **Macro** | LCDMA, 410 séries mensuelles (1981 →) | FRED-MD, 126 séries mensuelles (1959 →) |
 | **Indices de référence** | S&P/TSX composite | S&P 500, NASDAQ |
 | **Fréquence** | mensuelle (prix en début de mois) | idem |
 | **Entraînement / test** | 2000 → 2007-12, puis 2008-01 → 2024-01 (193 mois) | idem |
 
-Deux définitions utiles. **LCDMA** (Large Canadian Database for Macroeconomic Analysis), une base qui rassemble
-et met en forme l'essentiel des statistiques macroéconomiques canadiennes, l'équivalent canadien de FRED-MD.
-**FRED-MD** (McCracken et Ng, 2016), la base mensuelle de la Réserve fédérale de Saint-Louis, standard de la
-recherche macroéconomique américaine. Sous-périodes étudiées en plus de 2008-2024 : 2008-2012, 2012-2020 et
-2020-2024.
+Une définition utile. **FRED-MD** (McCracken et Ng, 2016), la base mensuelle de la Réserve fédérale de
+Saint-Louis, standard de la recherche macroéconomique américaine ; la LCDMA, définie en section 2, en est
+l'équivalent canadien. Sous-périodes étudiées en plus de 2008-2024 : 2008-2012, 2012-2020 et 2020-2024.
 
 ## 4. La méthode, pas à pas
 
@@ -100,8 +103,13 @@ recherche macroéconomique américaine. Sous-périodes étudiées en plus de 200
    Quatre modèles de **classification** prédisent seulement le signe (le rendement sera-t-il positif ?) :
    régression logistique, XGBoost, Hist Gradient Boosting et Extra Trees en version classifieur.
 4. **Choisir les réglages sans tricher, ou presque.** Les hyperparamètres, les réglages internes de chaque modèle,
-   sont choisis par recherche bayésienne (Optuna, 50 essais, graine 123). Le mémoire les a choisis sur la période
-   de test elle-même, ce qui avantage les modèles ; cette limite est mesurée en section 8.
+   sont choisis par recherche bayésienne, une exploration qui concentre les essais sur les réglages les plus
+   prometteurs (Optuna, 50 essais, graine 123). Deux réserves, mesurées en section 8. D'une part, le mémoire les
+   a choisis sur la période de test elle-même. D'autre part, pour les régresseurs, la sélection retient l'essai
+   le moins bon de la recherche au sens du R² : l'outil de recherche trie ses essais en ordre croissant et le
+   pipeline de 2024 prenait la première ligne. La sélection bride donc les régresseurs au lieu de les avantager ;
+   ce comportement est conservé par défaut pour rester fidèle au pipeline de 2024, et l'option `--select-best`
+   le corrige.
 5. **Construire les portefeuilles long short.** Chaque mois, le portefeuille **achète** (position longue) les
    10 titres aux prédictions les plus hautes et **vend à découvert** (position short) les 10 titres aux prédictions
    les plus basses, à poids égaux de chaque côté. Vendre à découvert, c'est vendre un titre emprunté pour le
@@ -122,8 +130,8 @@ viennent de `results/v2/metrics.csv`, régénérable par une commande (section 7
 
 | Modèle | É.-U. TCAC | É.-U. Sharpe | É.-U. perte max. | Canada TCAC | Canada Sharpe | Canada perte max. |
 |---|---:|---:|---:|---:|---:|---:|
-| Ridge (rég.) | −0,9 % | 0,00 | −44,6 % | −6,6 % | −0,30 | −75,8 % |
-| XGBoost (rég.) | −0,6 % | 0,02 | −57,9 % | 5,6 % | 0,40 | −35,4 % |
+| Ridge (rég.) | −0,9 % | 0,00 | −44,6 % | −6,6 % | −0,29 | −75,8 % |
+| XGBoost (rég.) | −0,6 % | 0,02 | −57,9 % | 5,6 % | 0,39 | −35,4 % |
 | AdaBoost (rég.) | 0,4 % | 0,10 | −33,6 % | 1,3 % | 0,16 | −46,2 % |
 | Extra Trees (rég.) | 6,9 % | 0,76 | −19,6 % | −3,5 % | −0,13 | −56,8 % |
 | Logistique (class.) | 6,7 % | 0,72 | −24,8 % | −2,9 % | −0,10 | −51,3 % |
@@ -131,19 +139,25 @@ viennent de `results/v2/metrics.csv`, régénérable par une commande (section 7
 | **Hist Gradient Boosting (class.)** | **7,4 %** | **0,80** | −18,1 % | −1,6 % | −0,01 | −48,0 % |
 | Extra Trees (class.) | 5,6 % | 0,63 | −17,4 % | −3,5 % | −0,13 | −56,8 % |
 
-Points de comparaison sur la même période : **S&P 500 : 11,4 %** (Sharpe 0,59) ; équipondéré des 50 titres
-américains : 11,1 % (0,66) ; **composite TSX : 2,6 %** (0,24) ; équipondéré des 50 titres canadiens : 11,9 % (0,80).
+Points de comparaison sur la même période : **S&P 500 : 7,6 %** (Sharpe 0,46) ; équipondéré des 50 titres
+américains : 10,8 % (0,64) ; **composite TSX : 2,6 %** (0,24) ; équipondéré des 50 titres canadiens : 11,5 % (0,78).
+Jusqu'au 2026-08-28, ce dépôt affichait ici le NASDAQ sous l'étiquette « S&P 500 » (11,5 %, Sharpe 0,59), un
+artefact hérité du pipeline de 2024, et un équipondéré qui sautait son premier mois ; les deux sont corrigés
+(section 9 et `docs/VERIFICATION_2026-08-23.md`, addendum du 2026-08-28).
 
 Comment lire ce tableau, en trois constats :
 
 - **Aucun portefeuille long short ne bat le simple équipondéré.** Le meilleur modèle américain rapporte 7,4 % par
-  an, l'équipondéré 11,1 % avec moins de complexité. Au Canada, un seul modèle ressort (XGBoost régresseur, 5,6 %,
-  Sharpe 0,40), toujours sous l'équipondéré à 11,9 %. En revanche, les
+  an, l'équipondéré 10,8 % avec moins de complexité. Au Canada, un seul modèle ressort (XGBoost régresseur, 5,6 %,
+  Sharpe 0,39), toujours sous l'équipondéré à 11,5 %. En revanche, les
   pertes maximales des long short sont bien plus faibles (−18 % contre −50 % environ pour les indices en 2008-2009) :
   c'est l'intérêt d'une stratégie couverte, elle amortit les krachs.
-- **Les R² hors échantillon sont négatifs partout** (par exemple −0,40 en moyenne pour le Ridge américain) : les
-  prédictions expliquent moins bien les rendements qu'une simple moyenne. Prédire le niveau d'un rendement mensuel
-  avec la macro seule est, sur cet échantillon, hors de portée de ces modèles.
+- **Les R² hors échantillon sont négatifs ou voisins de zéro.** Cinq des huit moyennes de régression sont négatives (de
+  −1,28 pour le Ridge canadien à −0,10, colonne `r2_oos_average` de `results/v2/metrics.csv`) ; les trois
+  positives plafonnent à +0,03 (XGBoost canadien), et deux d'entre elles viennent des Extra Trees, qui
+  prédisent une constante (constat suivant). Les prédictions expliquent donc au mieux une part infime des
+  rendements ; prédire le niveau d'un rendement mensuel avec la macro seule est, sur cet échantillon, hors de
+  portée de ces modèles.
 - **Attention aux égalités de rangs.** Plusieurs modèles prédisent la même valeur pour tous les titres à la
   plupart des dates (mesuré dans `results/v2/tables/prediction_ties.csv` : 100 % des dates pour Extra Trees en
   régression, dont les hyperparamètres retenus élaguent chaque arbre jusqu'à une feuille unique ; plus de 90 %
@@ -152,10 +166,29 @@ Comment lire ce tableau, en trois constats :
   dans l'ordre des colonnes : la performance de ces lignes mesure alors un portefeuille quasi fixe, pas la
   clairvoyance du modèle. Les lignes Ridge, XGBoost et AdaBoost en régression, elles, classent réellement les titres.
 
-![Huit modèles, top 10, États-Unis, portefeuilles long short](results/v2/figures/usa/2008-2024_top10_corrected.png)
+![TCAC par modèle et par pays, ligne repère à l'équipondéré](results/v2/figures/summary_cagr_par_modele.png)
 
-*Croissance d'un dollar investi dans chaque portefeuille long short américain (top 10, sans coûts). Les figures
-canadiennes et le détail par signal sont dans `results/v2/figures/`.*
+Comment lire cette figure : chaque paire de barres est un modèle ; la hauteur donne le TCAC 2008-2024 de son
+portefeuille long short top 10, en pourcentage par an (bleu : États-Unis, orange : Canada) ; les lignes
+pointillées marquent l'équipondéré de chaque pays (10,8 et 11,5 %, `results/v2/metrics.csv`). Aucune barre
+n'atteint la ligne de son pays, et six barres canadiennes sur huit sont sous zéro. La figure est produite par
+`scripts/make_summary_figure.py`.
+
+| États-Unis | Canada |
+|---|---|
+| ![Huit portefeuilles long short américains, top 10](results/v2/figures/usa/2008-2024_top10_corrected.png) | ![Huit portefeuilles long short canadiens, top 10](results/v2/figures/canada/2008-2024_top10_corrected.png) |
+
+Comment lire la figure américaine : chaque courbe suit la valeur d'un dollar investi début 2008 dans un
+portefeuille long short top 10, sans coûts, sur une échelle linéaire ; une courbe sous 1 signifie que le
+portefeuille a perdu de l'argent depuis le départ (Ridge et XGBoost en régression y passent l'essentiel de la
+période). La courbe pointillée grise est l'équipondéré de référence (10,8 % par an) : elle finit au-dessus de
+toutes les autres.
+
+Comment lire la figure canadienne : même construction, un dollar investi début 2008, courbe sous 1 = perte,
+échelle linéaire. L'équipondéré en pointillés gris (11,5 % par an) domine tous les long short à partir de
+2012 ; seuls le XGBoost régresseur (2,40 $ à l'arrivée) et l'AdaBoost (1,23 $) finissent au-dessus de leur
+dollar de départ, et le Ridge termine à 0,33 $ (colonne `Cumulative_Returns` de `results/v2/metrics.csv`).
+Le détail par signal et le mode de réplication 2024 sont dans `results/v2/figures/`.
 
 ## 6. Ce que les modèles regardent : l'analyse SHAP
 
@@ -167,9 +200,12 @@ modèle est une boîte noire, mais que regarde-t-il ? ».
 
 Comment lire cette figure : chaque point est une observation (un titre, un mois de la période d'entraînement) ;
 sa position horizontale dit de combien la variable a déplacé la prédiction, sa couleur dit si la variable était
-haute (rouge) ou basse (bleue) ce mois-là. Pour le Ridge américain, les prix de producteurs (WPSID61), l'écart de
-taux à un an (T1YFFM) et l'investissement (INVEST) dominent. La version « classement » (moyenne des contributions
-absolues) est dans les fichiers `bar_*.png`.
+haute (rouge) ou basse (bleue) ce mois-là. Pour le Ridge américain, quatre séries de FRED-MD dominent :
+CUSR0000SAD, l'indice des prix à la consommation des biens durables ; USFIRE, l'emploi dans la finance,
+l'assurance et l'immobilier ; le niveau de l'indice S&P 500 lui-même ; et M2REAL, la masse monétaire M2 en
+dollars constants. Suivent NDMANEMP (l'emploi manufacturier des biens non durables) et UEMP27OV (les chômeurs
+depuis 27 semaines et plus) : le modèle lit surtout les prix, l'emploi et le marché boursier. La version
+« classement » (moyenne des contributions absolues) est dans les fichiers `bar_*.png`.
 
 Les figures des sept modèles couverts, pour les deux pays, sont dans `results/v2/figures/shap/` et se régénèrent
 par `uv run mlrp shap --country both`. Deux limites honnêtes : AdaBoost n'a pas d'explicateur SHAP adapté, et les
@@ -180,7 +216,7 @@ constante (section 5) : une figure vide qui dit la vérité vaut mieux qu'une fi
 
 ```bash
 uv sync --locked --all-extras                     # Python 3.12, versions figées (uv.lock)
-uv run pytest                                     # 32 tests, sans données externes
+uv run pytest                                     # 35 tests, sans données externes
 uv run python scripts/fetch_data.py               # prix Yahoo ; déposer macro_data.csv (LCDMA) et Fred-MD.csv
 uv run mlrp run --country both --period 2008-2024 --models thesis --signals all --jobs 8
 uv run mlrp table --country usa --period 2008-2024
@@ -200,6 +236,7 @@ Le code de 2024 reste exécutable à l'identique : `uv run ml-returns-pred run -
 | Limite | Statut |
 |---|---|
 | Hyperparamètres choisis sur la période de test (fuite de sélection) | reconnu ; validation purgée prévue dans `memoire-2.0` |
+| Pour les régresseurs, la sélection retient l'essai le moins bon de la recherche bayésienne (l'outil trie ses essais en ordre croissant, le pipeline de 2024 prenait la ligne 0, y compris pour un R² à maximiser) ; conservé par défaut pour la fidélité à 2024 | mesuré : R² retenu −741,0 contre −81,3 au meilleur essai (Ridge É.-U.) et −20,9 contre −0,90 (Ridge Canada), `data/cache_v2/*/tuning_results.parquet` ; correction par l'option `--select-best` |
 | Variables macro alignées un mois en avance sur le rendement prédit (convention du code de 2024) | mesuré : en alignement temps réel, le TCAC du Ridge américain passe de −0,9 % à −3,3 % et le R² moyen de −0,40 à −0,46 (`scripts/check_exog_alignment.py`) ; l'ordre de grandeur des conclusions ne change pas |
 | Prédictions identiques pour tous les titres à la plupart des dates pour plusieurs modèles (classement alphabétique de fait) | mesuré par modèle : `results/v2/tables/prediction_ties.csv` et `scripts/check_prediction_ties.py` |
 | Univers figé de titres survivants (biais de survie) ; celui de 2024 comptait 49 titres canadiens dont le FNB XIU.TO, la v1.1 passe à 50 vrais titres (CNQ, CGI) | reconnu ; univers point-in-time prévu dans `memoire-2.0` |
@@ -216,7 +253,11 @@ soustraite (les tableaux du mémoire décrivent donc des portefeuilles longs des
 brute), un rééquilibrage tombant un week-end est sauté, et le TCAC publié utilisait une convention en jours de
 bourse qui le sous-estime. L'équivalence avec le code d'origine est testée : mêmes hyperparamètres Optuna,
 prédictions à 2,8 × 10⁻⁷ près, poids identiques, rendements quotidiens à 1,2 × 10⁻¹⁶ près
-(`scripts/check_v2_equivalence.py`). Le détail complet est dans `docs/VERIFICATION_2026-08-23.md`. Les figures
+(`scripts/check_v2_equivalence.py`). Deux chiffres de référence diffèrent en revanche des tableaux de 2024
+depuis le 2026-08-28, volontairement : l'équipondéré détient désormais son premier mois (le calcul antérieur
+le sautait, son TCAC 2008-2024 passe de 11,1 à 10,8 % aux États-Unis et de 11,9 à 11,5 % au Canada), et
+l'indice américain est le vrai S&P 500 (le pipeline de 2024 chargeait le NASDAQ sous cette étiquette, 11,5 %
+affiché contre 7,6 % réel). Le détail complet est dans `docs/VERIFICATION_2026-08-23.md`. Les figures
 SHAP archivées de 2024 (`results/figures/`) moyennaient en outre les contributions entre les titres, ce qui les
 écrasait vers zéro ; celles de `results/v2/figures/shap/` empilent les observations, comme le veut l'usage.
 
@@ -229,7 +270,7 @@ memoire-uqam-2024/
 ├── config/                   YAML : réglages par modèle et espaces de recherche (2024)
 ├── docs/                     audit (VERIFICATION_2026-08-23.md) et architecture v2 (V2_ARCHITECTURE.md)
 ├── scripts/                  fetch_data, check_v2_equivalence, check_exog_alignment, check_prediction_ties, …
-├── tests/                    pytest (32) : long short, rangs, dérive, métriques, cache, équivalence v1/v2
+├── tests/                    pytest (35) : long short, rangs, dérive, métriques, cache, équivalence v1/v2
 ├── results/                  archive_2024/ (sorties d'origine), figures/ (PNG 2024), tables/,
 │                             v2/ : metrics.csv, rendements quotidiens, figures, figures SHAP, tables
 ├── reports/                  mémoire (PDF) et résumé officiel

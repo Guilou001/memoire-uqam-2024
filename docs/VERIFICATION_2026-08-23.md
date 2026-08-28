@@ -83,3 +83,54 @@ valeur pour tous les titres à la plupart des dates (Extra Trees régression : 1
 10 » de ces modèles se réduit alors à l'ordre des colonnes. Les figures SHAP de 2024 moyennaient par ailleurs
 les contributions entre titres et expliquaient des modèles aux hyperparamètres par défaut ; figures refaites
 dans `results/v2/figures/shap/` (détail : `V2_ARCHITECTURE.md`, section 5 ter).
+
+## Addendum du 2026-08-28 : trois artefacts supplémentaires, deux corrigés, un documenté
+
+### 1. L'indice « S&P 500 » du pipeline était le NASDAQ (M, corrigé)
+
+`config.py` pointait le benchmark américain vers `NASDAQ_2000-01-01_to_2024-06-01.csv` (niveaux du composite
+NASDAQ) alors que toute la prose, du mémoire au README, appelait cet indice « S&P 500 ». Le fichier
+`SP500_2000-01-01_to_2024-06-01.csv` (le vrai S&P 500) existait dans `data/raw_data/` sans être branché.
+Chiffres des deux indices sur 2008-01 → 2024-01, mesurés par le pipeline (colonnes `bench_CAGR` et
+`bench_Sharpe` de `results/v2/metrics.csv`, avant et après bascule) : NASDAQ, TCAC 11,45 %, Sharpe 0,59 ;
+S&P 500, TCAC 7,65 %, Sharpe 0,46. La comparaison publiée flattait donc l'indice de référence d'environ
+4 points de TCAC. `config.py` charge désormais le fichier S&P 500 ; tableaux, prose et PDF v1.1 régénérés.
+
+### 2. L'équipondéré de référence sautait son premier mois (M, corrigé)
+
+`runner.run` passait à `equally_weighted_long_only` une date de départ en jour de bourse (2008-01-02) ; le
+masque mensuel `mask.loc[start:]` supprimait alors la ligne du 1er du mois et le portefeuille ne détenait
+rien pendant son premier mois. Corrigé en ramenant la date au début de son mois
+(`to_period("M").to_timestamp()`), comportement figé par le test
+`test_equal_weight_holds_from_month_of_start`. Chiffres 2008-01 → 2024-01 (`ew_CAGR`, `ew_Sharpe` de
+`results/v2/metrics.csv`) : États-Unis, TCAC 11,08 % → 10,79 %, Sharpe 0,659 → 0,645 ; Canada,
+11,86 % → 11,45 %, 0,803 → 0,777. Les métriques des stratégies sont inchangées (vérifié colonne par colonne
+contre l'ancien CSV) et `scripts/check_v2_equivalence.py` passe toujours (2,8 × 10⁻⁷ ; 0 ; 1,2 × 10⁻¹⁶) :
+l'équivalence porte sur les stratégies, pas sur cette référence, qui diffère désormais des tableaux de 2024
+et c'est assumé. Relance des 384 combinaisons depuis le cache de prédictions : 12 secondes.
+
+### 3. La sélection d'hyperparamètres retient le pire essai pour les régresseurs (M, documenté, défaut conservé)
+
+`metrics.py` déclare la direction « maximize » pour les régresseurs (R² en première métrique), mais
+skforecast 0.13.0 trie toujours les essais par la première métrique en ordre croissant, et `return_best`
+comme `models.py` retiennent la ligne 0 : pour un R² à maximiser, c'est le PIRE des 50 essais. Mesuré dans le
+cache (`data/cache_v2/<clé>/tuning_results.parquet`, colonne `r_squared_modified__average`) : Ridge
+États-Unis, essai retenu R² −741,0 contre −81,3 au meilleur ; Ridge Canada, −20,9 contre −0,90. Les
+classifieurs ne sont pas touchés (première métrique : p-value de Pesaran-Timmermann, à minimiser, donc le tri
+croissant est le bon). L'artefact vient des YAML de 2024 : il est fidèle à la réplication mais n'était pas
+déclaré, et le README affirmait même que la sélection « avantage les modèles ». Le comportement par défaut
+est conservé (l'équivalence avec 2024 doit tenir) ; l'option `--select-best` (`TuningSpec.select_best`)
+resélectionne le meilleur essai et reconstruit le forecaster avant le backtest, sans toucher aux clés de
+cache des exécutions par défaut.
+
+### 4. Deux correctifs mineurs (M)
+
+- `scripts/make_latex_tables.py` mettait en gras vert la PIRE perte maximale (`s.min()` sur des valeurs
+  négatives) ; le meilleur drawdown est le plus proche de zéro. Corrigé, les huit tableaux `.tex` régénérés.
+- `runner.py` : la clé de déduplication de `results/v2/metrics.csv` ignorait le réglage de tuning ; un run
+  `--no-tuning` écrasait la ligne tunée. Colonne `tuning` ajoutée à la table et à la clé.
+
+Régénérations du 2026-08-28 : figures de croissance des deux pays (légendes lisibles, courbe équipondérée en
+repère, axe des x étiqueté), 28 figures SHAP (titres sans tirets cadratins), nouvelle figure de synthèse
+`results/v2/figures/summary_cagr_par_modele.png` (`scripts/make_summary_figure.py`), tableaux LaTeX, prose et
+PDF `reports/memoire_v1.1/memoire_v1_1.pdf` (tectonic).

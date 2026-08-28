@@ -60,7 +60,7 @@ def paragraph(m: pd.DataFrame, period: str) -> str:
     if not reg.empty and reg["r2_oos_average"].notna().any():
         r2 = reg.set_index("model")["r2_oos_average"].dropna()
         lines.append(
-            f"Les $R^2$ hors échantillon moyens des régressions restent négatifs "
+            f"Les $R^2$ hors échantillon moyens des régressions restent négatifs ou nuls "
             f"(de {num(float(r2.min()))} à {num(float(r2.max()))} côté américain) : les prédictions expliquent moins "
             f"bien les rendements qu'une moyenne simple, et la valeur des portefeuilles vient du classement, non du "
             f"niveau prédit. Les modèles dont les prédictions sont identiques pour tous les titres à la plupart des "

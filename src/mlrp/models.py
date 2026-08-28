@@ -136,6 +136,15 @@ def predict(model: str, series: pd.DataFrame, exog: pd.DataFrame, cutoff: str, t
             kwargs_study_optimize={},
         )
         best_params = dict(tuning_results.iloc[0]["params"]) if "params" in tuning_results else best_params
+        if tuning.select_best and direction == "maximize" and "params" in tuning_results:
+            # skforecast trie toujours les essais par la première métrique en ordre CROISSANT et
+            # ``return_best`` réajuste le forecaster sur la ligne 0 : quand la métrique est à maximiser
+            # (R² des régresseurs), c'est le pire essai. Ici, on resélectionne le meilleur et on
+            # reconstruit le forecaster avec ses paramètres avant le backtest.
+            col = next(c for c in tuning_results.columns if c.startswith(metric_names[0]))
+            best_row = tuning_results.sort_values(col, ascending=False).iloc[0]
+            best_params = dict(best_row["params"])
+            forecaster = make_forecaster(model, {**params, **best_params}, len(best_row["lags"]))
 
     metrics_levels, y_pred = backtesting_forecaster_multiseries(
         forecaster=forecaster, series=series, exog=exog, steps=1, metric=list(metrics),

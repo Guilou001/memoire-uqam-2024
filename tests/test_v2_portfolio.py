@@ -100,6 +100,17 @@ def test_positive_signal_and_long_only(market):
     assert ew.turnover.iloc[0] == 0.0
 
 
+def test_equal_weight_holds_from_month_of_start(market):
+    """L'équipondéré détient dès le mois de ``start`` : un start en jour de bourse (le 2, le 1er tombant un
+    week-end) ne doit pas faire sauter le premier mois (défaut corrigé le 2026-08-28 : ``mask.loc[start:]``
+    sur l'index mensuel supprimait la ligne du 1er)."""
+    prices, y_pred = market
+    ew = equally_weighted_long_only(y_pred.notna().astype(float), prices, start="2015-03-02")
+    first_rebal = ew.turnover.index[0]
+    assert (first_rebal.year, first_rebal.month) == (2015, 3)
+    assert len(ew.turnover) == len(y_pred)  # tous les mois de l'index cible sont rééquilibrés
+
+
 def test_costs_reduce_returns(market):
     prices, y_pred = market
     lw, sw = build_weights(y_pred, "top10", "regressor")

@@ -87,7 +87,10 @@ def rows_for_family(metrics: pd.DataFrame, period: str, family: str) -> list[str
                 sp_pt = [classifier_stats(c, period, m) for m in b.index]
                 b = b.assign(SP=[v[0] for v in sp_pt], PT=[v[1] for v in sp_pt])
             block[c] = b
-        best = {c: {col: bold_green_mask(block[c], col, maximize=(col not in ("Max_Drawdown", "PT")))
+        # Max_Drawdown est négatif : le meilleur est le plus proche de zéro, donc le maximum (corrigé le
+        # 2026-08-28 ; l'ancien masque en minimisation mettait la PIRE perte en gras vert). Seule la
+        # p-value de Pesaran-Timmermann (PT) se minimise.
+        best = {c: {col: bold_green_mask(block[c], col, maximize=(col != "PT"))
                     for col in block[c].columns} for c in ("canada", "usa")}
         for model, name in models:
             parts = [name]

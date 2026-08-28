@@ -17,7 +17,7 @@ from mlrp.config import PERIODS, RESULTS_DIR, SIGNALS, THESIS_MODELS, RunSpec, T
 
 
 def _specs(args) -> list[RunSpec]:
-    tuning = TuningSpec(n_trials=args.n_trials, tune=not args.no_tuning)
+    tuning = TuningSpec(n_trials=args.n_trials, tune=not args.no_tuning, select_best=args.select_best)
     countries = ["canada", "usa"] if args.country == "both" else [args.country]
     periods = list(PERIODS) if args.period == "all" else [args.period]
     models = THESIS_MODELS if args.models == "thesis" else args.models.split(",")
@@ -98,6 +98,9 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--fee", type=float, default=0.0)
         sp.add_argument("--n-trials", type=int, default=50)
         sp.add_argument("--no-tuning", action="store_true")
+        sp.add_argument("--select-best", action="store_true",
+                        help="retient le meilleur essai de la recherche (par défaut : pire essai pour les "
+                             "régresseurs, artefact du pipeline de 2024 conservé pour la réplication)")
         sp.add_argument("--jobs", type=int, default=1, help="processus en parallèle pour les prédictions")
 
     r = sub.add_parser("run", help="exécute des modèles, signaux et modes choisis")

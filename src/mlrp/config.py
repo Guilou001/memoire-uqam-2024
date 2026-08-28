@@ -28,8 +28,10 @@ COUNTRIES: dict[str, dict] = {
         "prices": "us_stocks_2000-01-01_to_2024-06-01.csv",
         "macro": "Fred-MD.csv",
         "macro_kind": "fredmd",
-        "benchmark": "NASDAQ_2000-01-01_to_2024-06-01.csv",
-        "benchmark_name": "NASDAQ",
+        # Le pipeline de 2024 pointait ici le NASDAQ (^IXIC) tout en l'appelant « S&P 500 » dans la prose ;
+        # corrigé le 2026-08-28 (voir docs/VERIFICATION_2026-08-23.md, addendum du 2026-08-28).
+        "benchmark": "SP500_2000-01-01_to_2024-06-01.csv",
+        "benchmark_name": "SP500",
     },
 }
 
@@ -47,6 +49,18 @@ THESIS_MODELS = REGRESSORS + CLASSIFIERS
 SIGNALS = ("top10", "top20", "positive")
 LONG_SHORT_MODES = ("corrected", "as_published")
 
+COUNTRY_LABELS = {"canada": "Canada", "usa": "États-Unis"}
+MODEL_LABELS = {  # noms lisibles pour les légendes et titres de figures
+    "ridge_regressor": "Ridge (rég.)",
+    "xgboost_regressor": "XGBoost (rég.)",
+    "ada_boost_regressor": "AdaBoost (rég.)",
+    "extra_trees_regressor": "Extra Trees (rég.)",
+    "logistic_regression_classifier": "Logistique (class.)",
+    "xgboost_classifier": "XGBoost (class.)",
+    "hist_gradient_boosting_classifier": "Hist Gradient Boosting (class.)",
+    "extra_trees_classifier": "Extra Trees (class.)",
+}
+
 
 def model_family(model: str) -> str:
     """``"classifier"`` si le nom se termine par classifier, sinon ``"regressor"``."""
@@ -55,13 +69,19 @@ def model_family(model: str) -> str:
 
 @dataclass(frozen=True)
 class TuningSpec:
-    """Paramètres de la recherche bayésienne (identiques au mémoire par défaut)."""
+    """Paramètres de la recherche bayésienne (identiques au mémoire par défaut).
+
+    ``select_best=False`` reproduit l'artefact de 2024 pour les régresseurs : skforecast trie les essais
+    par la première métrique en ordre croissant et retient la ligne 0, donc le PIRE essai quand la
+    métrique (R²) est à maximiser. ``select_best=True`` retient réellement le meilleur essai.
+    """
 
     n_trials: int = 50
     lags_grid: tuple[int, ...] = (12, 24)
     lags_default: int = 6
     seed: int = 123
     tune: bool = True
+    select_best: bool = False
 
 
 @dataclass(frozen=True)
@@ -105,6 +125,8 @@ class RunSpec:
     def prediction_key(self) -> str:
         """Clé de cache des prédictions : ne dépend ni du signal, ni du mode long-short, ni des coûts."""
         payload = {"country": self.country, "period": self.period, "model": self.model, "tuning": asdict(self.tuning)}
+        if not payload["tuning"]["select_best"]:  # champ ajouté en 2026-08-28 : absent de la clé par défaut
+            del payload["tuning"]["select_best"]  # pour ne pas invalider le cache des exécutions historiques
         return hashlib.sha1(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:12]
 
     def label(self) -> str:
