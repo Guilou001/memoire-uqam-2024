@@ -5,7 +5,7 @@ title: "ml-returns-pred : pipeline du mémoire « Évaluation empirique d'actifs
 version: 1.0.0
 date-released: 2026-08-23
 license: MIT
-repository-code: "https://github.com/Guilou001/memoire-uqam-2024"
+repository-code: "https://github.com/Guilou001/04-memoire-uqam-2024"
 authors:
   - family-names: Vaudescal
     given-names: Guillaume

@@ -5,7 +5,7 @@ automatique* (Guillaume Vaudescal, UQAM, décembre 2024, dir. Philippe Goulet Co
 rendu reproductible en 2026 : environnement figé, ligne de commande, 35 tests, résultats et figures régénérables
 à l'identique. Le mémoire complet (PDF, 96 pages) est dans [`reports/`](reports/).
 
-[![ci](https://github.com/Guilou001/memoire-uqam-2024/actions/workflows/ci.yml/badge.svg)](https://github.com/Guilou001/memoire-uqam-2024/actions/workflows/ci.yml)
+[![ci](https://github.com/Guilou001/04-memoire-uqam-2024/actions/workflows/ci.yml/badge.svg)](https://github.com/Guilou001/04-memoire-uqam-2024/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![licence](https://img.shields.io/badge/code-MIT-green)
 ![rapport](https://img.shields.io/badge/m%C3%A9moire-PDF-lightgrey)

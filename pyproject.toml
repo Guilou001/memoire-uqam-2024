@@ -51,7 +51,7 @@ ml-returns-pred = "ml_returns_pred.cli:main"
 mlrp = "mlrp.cli:main"
 
 [project.urls]
-Repository = "https://github.com/Guilou001/memoire-uqam-2024"
+Repository = "https://github.com/Guilou001/04-memoire-uqam-2024"
 Thesis = "https://archipel.uqam.ca/"
 
 [tool.hatch.build.targets.wheel]
