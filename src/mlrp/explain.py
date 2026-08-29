@@ -106,11 +106,34 @@ def shap_figures(spec: RunSpec, out_dir: Path = RESULTS_DIR / "figures" / "shap"
     out_dir = out_dir / spec.country
     out_dir.mkdir(parents=True, exist_ok=True)
     made = []
+    # l'unité de l'abscisse dépend de la FAMILLE : un rendement mensuel pour les régresseurs,
+    # une log-cote pour les classifieurs. La bibliothèque écrit « SHAP value (impact on model
+    # output) » dans les deux cas, ce qui laisse comparer des amplitudes incomparables.
+    from mlrp.config import model_family
+
+    regresseur = model_family(spec.model) == "regressor"
+    unite = ("rendement mensuel prédit (fraction ; 0,05 = 5 points de pourcentage)" if regresseur
+             else "score brut du classifieur (log-cote de la classe hausse)")
+    axes_x = {"dot": f"Contribution SHAP au {unite}",
+              "bar": f"Contribution SHAP moyenne en valeur absolue, {unite}"}
     for plot_type, suffix in (("dot", "summary"), ("bar", "bar")):
         plt.figure()
         shap.summary_plot(shap_values=shap_df.values, features=x_df, plot_type=plot_type,
                           max_display=max_display, show=False)
         fig = plt.gcf()
+        ax = fig.axes[0]
+        ax.set_xlabel(axes_x[plot_type], fontsize=8.5)
+        if plot_type == "bar":
+            # une moyenne de valeurs absolues ne peut pas être négative
+            ax.set_xlim(left=0.0)
+            if float(np.abs(shap_df.values).max()) == 0.0:
+                ax.annotate("Toutes les contributions sont nulles : le modèle retenu prédit une\n"
+                            "constante. Résultat mesuré, pas un échec de rendu.",
+                            (0.5, 0.5), xycoords="axes fraction", ha="center", va="center",
+                            fontsize=9, color="#444444")
+        if len(fig.axes) > 1:                      # la barre de couleur de l'essaim
+            fig.axes[-1].set_ylabel("Valeur de la variable (basse en bas, élevée en haut)",
+                                    fontsize=8)
         fig.suptitle(f"{COUNTRY_LABELS.get(spec.country, spec.country)}, "
                      f"{MODEL_LABELS.get(spec.model, spec.model)}, entraînement 2000-2007", fontsize=9, y=1.0)
         out = out_dir / f"{suffix}_{spec.model}.png"

@@ -1,7 +1,7 @@
 """Télécharge les données brutes dans data/raw_data/ (idempotent).
 
 - Prix quotidiens des 49 titres canadiens et des 50 titres américains, et des indices de référence
-  (^GSPTSE -> TSX60, ^GSPC -> SP500, ^IXIC -> NASDAQ) via yfinance, 2000-01-01 -> 2024-06-01, prix de
+  (^GSPTSE -> S&P/TSX composite, ^GSPC -> S&P 500, ^IXIC -> NASDAQ) via yfinance, 2000-01-01 -> 2024-06-01, prix de
   clôture ajustés (auto_adjust=True), comme dans les fichiers utilisés par le mémoire.
 - FRED-MD (McCracken et Ng) : à déposer à la main sous ``data/raw_data/Fred-MD.csv`` (séparateur « ; »,
   colonne ``sasdate``) ; le script indique l'URL. Le mémoire a utilisé le millésime de juin 2024.
@@ -26,6 +26,7 @@ from ml_returns_pred.paths import DATA_DIR  # noqa: E402
 
 RAW = DATA_DIR / "raw_data"
 START, END = "2000-01-01", "2024-06-01"
+# la clé « TSX60 » est le nom de FICHIER hérité de 2024 ; le ticker est celui du composite
 BENCHMARKS = {"TSX60": "^GSPTSE", "SP500": "^GSPC", "NASDAQ": "^IXIC"}
 
 

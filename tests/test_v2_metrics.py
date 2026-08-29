@@ -29,6 +29,26 @@ def test_prediction_metrics_equal_legacy():
         LEGACY_METRICS["pesaran_timmermann_p_value"](yb, pb))
 
 
+def test_r2_survit_a_un_titre_entre_en_bourse_apres_le_debut():
+    # un seul rendement manquant dans l'échantillon d'entraînement rendait la moyenne NaN, donc le
+    # R² NaN, sans message : c'est ce qui vidait la colonne r2_oos_pooling du panel américain
+    rng = np.random.default_rng(7)
+    y_true, y_pred = rng.normal(size=50), rng.normal(size=50)
+    y_train = rng.normal(size=200)
+    reference = r_squared_modified(y_true, y_pred, y_train)
+    y_train_troue = y_train.copy()
+    y_train_troue[3] = np.nan
+    assert np.isfinite(r_squared_modified(y_true, y_pred, y_train_troue))
+    # la moyenne sans le point manquant reste très proche de la moyenne complète
+    assert r_squared_modified(y_true, y_pred, y_train_troue) == pytest.approx(reference, abs=0.02)
+    # un trou dans y_true ou y_pred est écarté au lieu de contaminer la somme
+    y_true_troue, y_pred_troue = y_true.copy(), y_pred.copy()
+    y_true_troue[0] = np.nan
+    y_pred_troue[1] = np.nan
+    assert np.isfinite(r_squared_modified(y_true_troue, y_pred_troue, y_train))
+    assert np.isnan(r_squared_modified(np.full(3, np.nan), np.zeros(3), y_train))
+
+
 def test_cagr_calendar_years():
     idx = pd.bdate_range("2010-01-01", "2019-12-31")
     r = pd.Series(0.0, index=idx)

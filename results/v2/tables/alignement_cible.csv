@@ -1,0 +1,5 @@
+pays,cible,tcac_pct,sharpe
+usa,cible du pipeline (mois écoulé),-3.025,-0.131
+usa,cible décalée (mois à venir),465.25,11.088
+canada,cible du pipeline (mois écoulé),-7.149,-0.242
+canada,cible décalée (mois à venir),891.731,10.477

@@ -21,8 +21,11 @@ COUNTRIES: dict[str, dict] = {
         "prices": "canadian_stocks_2000-01-01_to_2024-06-01.csv",
         "macro": "macro_data.csv",
         "macro_kind": "lcdma",
+        # Le fichier s'appelle TSX60 depuis 2024, mais le ticker téléchargé est ^GSPTSE, c'est-à-dire
+        # le S&P/TSX COMPOSITE (environ 230 titres) et non le TSX 60 (60 titres) : deux indices
+        # distincts. Le nom de fichier est conservé, l'étiquette de lecture est corrigée (2026-08-29).
         "benchmark": "TSX60_2000-01-01_to_2024-06-01.csv",
-        "benchmark_name": "TSX60",
+        "benchmark_name": "S&P/TSX composite (^GSPTSE)",
     },
     "usa": {
         "prices": "us_stocks_2000-01-01_to_2024-06-01.csv",

@@ -28,6 +28,10 @@ def cumulative_plot(returns: dict[str, pd.Series], title: str, out: Path, log_sc
     """Courbes de croissance d'un dollar (échelle linéaire ou logarithmique).
 
     ``reference`` : nom d'une série à tracer en pointillés gris épais (repère, hors cycle de couleurs).
+
+    Convention déclarée : les courbes composent ``(1 + r)`` sur le rendement de la stratégie, donc,
+    pour un portefeuille long moins court, un dollar de collatéral non rémunéré. L'ordonnée est un
+    multiple du capital de départ (1,00 au premier jour), sans dimension.
     """
     _style()
     fig, ax = plt.subplots()
@@ -39,9 +43,9 @@ def cumulative_plot(returns: dict[str, pd.Series], title: str, out: Path, log_sc
             ax.plot(wealth, label=name, lw=1.2)
     if log_scale:
         ax.set_yscale("log")
-    ax.set_title(title)
+    ax.set_title(title, fontsize=10.5)
     ax.set_xlabel("Date")
-    ax.set_ylabel("Valeur d'un dollar investi")
+    ax.set_ylabel("Valeur d'un dollar investi (multiple du capital de départ)")
     ax.legend(ncol=2, fontsize=8)
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out.with_suffix(".png"), dpi=160)
@@ -88,12 +92,37 @@ def _equal_weight_reference(country: str, period: str, start: pd.Timestamp) -> p
     return equally_weighted_long_only(ds.returns_monthly, ds.prices_daily, start=str(start.date())).returns.loc[:end]
 
 
+def cost_label(country: str, period: str, mode: str, metrics_path: Path = RESULTS_DIR / "metrics.csv") -> str:
+    """Ce que les courbes incluent vraiment en fait de coûts, lu dans ``metrics.csv``.
+
+    Le titre d'une figure ne doit pas affirmer un traitement des coûts que les rendements tracés ne
+    portent pas : la colonne ``fee`` des mesures dit quels frais ont servi à l'exécution. Frais nuls,
+    le titre annonce « avant coûts de transaction » ; frais uniformes, il donne le montant en points de
+    base par unité de rotation (la rotation étant la somme des variations de poids en valeur absolue,
+    les deux jambes comptées). Fichier absent ou frais mélangés, l'ignorance est déclarée telle quelle.
+    """
+    if not metrics_path.exists():
+        return "coûts de transaction non renseignés"
+    m = pd.read_csv(metrics_path, usecols=["country", "period", "mode", "fee"])
+    fees = m[(m["country"] == country) & (m["period"] == period)
+             & (m["mode"] == mode)]["fee"].dropna().unique()
+    if len(fees) != 1:
+        return "coûts de transaction non renseignés"
+    fee = float(fees[0])
+    if fee == 0.0:
+        return "avant coûts de transaction"
+    return f"net de {fee * 1e4:.0f} points de base par unité de rotation"
+
+
 def figures_for_period(returns_dir: Path, country: str, period: str, out_dir: Path = RESULTS_DIR / "figures") -> list[Path]:
     """Une figure par mode : tous les modèles d'un pays et d'une période (signal top10 si présent),
     plus la courbe équipondérée du pays en repère (pointillés gris)."""
     made = []
     labels = {"usa": "États-Unis", "canada": "Canada"}
-    mode_labels = {"corrected": "long short", "as_published": "réplication du code de 2024"}
+    # « long short » ne disait pas en quoi les deux modes diffèrent ; ils diffèrent par la composition
+    # des jambes (soustraite ou additionnée) et par l'alignement du rééquilibrage.
+    mode_labels = {"corrected": "écart long moins court",
+                   "as_published": "jambes additionnées, convention du code de 2024"}
     reference = "Équipondéré (référence)"
     for mode in ("corrected", "as_published"):
         series = {}
@@ -104,7 +133,8 @@ def figures_for_period(returns_dir: Path, country: str, period: str, out_dir: Pa
             ew = _equal_weight_reference(country, period, min(s.index[0] for s in series.values()))
             if ew is not None:
                 series[reference] = ew
-            title = f"{labels.get(country, country)}, {period}, top 10, {mode_labels[mode]}, brut de coûts"
+            title = (f"{labels.get(country, country)}, {period}, signal top 10\n"
+                     f"{mode_labels[mode]}, {cost_label(country, period, mode)}")
             made.append(cumulative_plot(series, title, out_dir / country / f"{period}_top10_{mode}",
                                         reference=reference))
     return made

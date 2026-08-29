@@ -179,7 +179,9 @@ n'atteint la ligne de son pays, et six barres canadiennes sur huit sont sous zé
 | ![Huit portefeuilles long short américains, top 10](results/v2/figures/usa/2008-2024_top10_corrected.png) | ![Huit portefeuilles long short canadiens, top 10](results/v2/figures/canada/2008-2024_top10_corrected.png) |
 
 Comment lire la figure américaine : chaque courbe suit la valeur d'un dollar investi début 2008 dans un
-portefeuille long short top 10, sans coûts, sur une échelle linéaire ; une courbe sous 1 signifie que le
+portefeuille long short top 10, avant coûts de transaction, sur une échelle linéaire ; l'ordonnée est un
+multiple du capital de départ, et le dollar de collatéral qui finance la jambe vendeuse n'est pas rémunéré.
+Une courbe sous 1 signifie que le
 portefeuille a perdu de l'argent depuis le départ (Ridge et XGBoost en régression y passent l'essentiel de la
 période). La courbe pointillée grise est l'équipondéré de référence (10,8 % par an) : elle finit au-dessus de
 toutes les autres.
@@ -235,7 +237,9 @@ Le code de 2024 reste exécutable à l'identique : `uv run ml-returns-pred run -
 
 | Limite | Statut |
 |---|---|
+| **Le portefeuille du mois M est classé par la prévision du rendement du mois M-1, déjà encaissé quand la position s'ouvre.** `arithmetic_returns` est un `pct_change` : la ligne datée du 1er mars porte le rendement de février. Le modèle prédit cette ligne, les poids en sont tirés à la même date, et le portefeuille encaisse mars. Le signal a donc un mois de retard sur ce qu'il prétend prévoir. Défaut hérité du pipeline de 2024 et conservé ici pour la fidélité ; `memoire-2.0` le corrige en posant explicitement `target = r.shift(-1)` | **mesuré par un test-oracle** : en donnant au constructeur de portefeuille la connaissance PARFAITE de la cible telle que le pipeline la définit, le top 10 long short rapporte **−3,0 %/an aux États-Unis et −7,2 %/an au Canada** ; la même clairvoyance sur le mois RÉELLEMENT encaissé rapporte +465 %/an et +892 %/an (`scripts/check_target_alignment.py`, `results/v2/tables/alignement_cible.csv`). Aucun résultat du dépôt n'est gonflé par une fuite, mais le classement testé est celui d'un rendement passé |
 | Hyperparamètres choisis sur la période de test (fuite de sélection) | reconnu ; validation purgée prévue dans `memoire-2.0` |
+| `r_squared_modified` prenait `np.mean` sur l'échantillon d'entraînement : un seul rendement manquant, celui d'un titre entré en bourse après le début de l'échantillon, rendait le R² NaN sans message, et vidait la colonne `r2_oos_pooling` du panel américain | corrigé le 2026-08-29 (moyenne et masques insensibles aux valeurs manquantes), test `test_r2_survit_a_un_titre_entre_en_bourse_apres_le_debut` |
 | Pour les régresseurs, la sélection retient l'essai le moins bon de la recherche bayésienne (l'outil trie ses essais en ordre croissant, le pipeline de 2024 prenait la ligne 0, y compris pour un R² à maximiser) ; conservé par défaut pour la fidélité à 2024 | mesuré : R² retenu −741,0 contre −81,3 au meilleur essai (Ridge É.-U.) et −20,9 contre −0,90 (Ridge Canada), `data/cache_v2/*/tuning_results.parquet` ; correction par l'option `--select-best` |
 | Variables macro alignées un mois en avance sur le rendement prédit (convention du code de 2024) | mesuré : en alignement temps réel, le TCAC du Ridge américain passe de −0,9 % à −3,3 % et le R² moyen de −0,40 à −0,46 (`scripts/check_exog_alignment.py`) ; l'ordre de grandeur des conclusions ne change pas |
 | Prédictions identiques pour tous les titres à la plupart des dates pour plusieurs modèles (classement alphabétique de fait) | mesuré par modèle : `results/v2/tables/prediction_ties.csv` et `scripts/check_prediction_ties.py` |
@@ -260,6 +264,16 @@ l'indice américain est le vrai S&P 500 (le pipeline de 2024 chargeait le NASDAQ
 affiché contre 7,6 % réel). Le détail complet est dans `docs/VERIFICATION_2026-08-23.md`. Les figures
 SHAP archivées de 2024 (`results/figures/`) moyennaient en outre les contributions entre les titres, ce qui les
 écrasait vers zéro ; celles de `results/v2/figures/shap/` empilent les observations, comme le veut l'usage.
+
+Trois libellés des sorties archivées de 2024 sont faux et restent tels quels, l'archive n'étant pas modifiée
+(audit du 2026-08-29). Les 48 figures de rendements cumulés de `results/figures/` portent en ordonnée
+« Cumulative Returns » alors qu'elles tracent le LOGARITHME NATUREL de la valeur d'un dollar sur une échelle
+linéaire : une ordonnée à 3,15 se lit +2 236 % et non +315 %. La colonne CAGR des tables archivées mélange
+deux unités selon la ligne, les portefeuilles en pourcentage et les indices de référence en fraction, soit un
+facteur 100 entre lignes voisines. Et l'indice canadien y est appelé « TSX60 » alors que le ticker téléchargé
+est `^GSPTSE`, c'est-à-dire le S&P/TSX COMPOSITE, environ 230 titres au lieu de 60 : même famille d'erreur que
+le NASDAQ étiqueté S&P 500. Le nom de fichier est conservé pour ne pas casser la réplication ; l'étiquette de
+lecture de `mlrp` est corrigée en « S&P/TSX composite (^GSPTSE) ».
 
 ## 10. Arborescence
 

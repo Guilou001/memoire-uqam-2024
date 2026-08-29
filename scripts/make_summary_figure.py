@@ -1,6 +1,6 @@
 """Figure de synthèse du README : TCAC par modèle, États-Unis et Canada côte à côte, repère équipondéré.
 
-Lit ``results/v2/metrics.csv`` (portefeuilles top 10, mode long short, 2008-2024, sans coûts) et trace des
+Lit ``results/v2/metrics.csv`` (portefeuilles top 10, mode long short, 2008-2024, avant coûts de transaction) et trace des
 barres alignées par modèle pour les deux pays, avec une ligne pointillée par pays au niveau du portefeuille
 équipondéré. Palette Okabe-Ito, police 11, DPI 200.
 
@@ -48,8 +48,8 @@ def main() -> int:
     ax.axhline(ew_can * 100, color=ORANGE, ls="--", lw=1.4, label=f"Équipondéré Canada ({pc(ew_can)})")
     ax.axhline(0, color="#000000", lw=0.8)
     ax.set_xticks(x, [MODEL_LABELS[mdl] for mdl in THESIS_MODELS], rotation=30, ha="right")
-    ax.set_ylabel("TCAC 2008-2024 (% par an)")
-    ax.set_xlabel("Modèle (portefeuille long short top 10, sans coûts)")
+    ax.set_ylabel("Taux de croissance annuel composé\n2008-2024 (% par an)")
+    ax.set_xlabel("Modèle (portefeuille long short top 10, écart long moins court,\navant coûts de transaction)")
     ax.set_title("Aucun portefeuille long short ne rejoint l'équipondéré de son pays")
     ax.legend(ncol=2, fontsize=10)
     OUT.parent.mkdir(parents=True, exist_ok=True)

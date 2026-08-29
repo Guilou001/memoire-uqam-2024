@@ -12,9 +12,20 @@ TRADING_DAYS = 252
 
 # ----------------------------------------------------------------------------- prédiction (code 2024)
 def r_squared_modified(y_true, y_pred, y_train) -> float:
-    """R² hors échantillon avec, au dénominateur, la moyenne de l'échantillon d'entraînement (code 2024)."""
-    ssr = np.sum((np.asarray(y_true) - np.asarray(y_pred)) ** 2)
-    sst = np.sum((np.asarray(y_true) - np.mean(np.asarray(y_train))) ** 2)
+    """R² hors échantillon avec, au dénominateur, la moyenne de l'échantillon d'entraînement (code 2024).
+
+    Les valeurs manquantes sont écartées explicitement. Le code de 2024 employait ``np.mean`` sur
+    ``y_train`` : un seul rendement manquant, celui d'un titre entré en bourse après le début de
+    l'échantillon, suffisait à rendre la moyenne NaN, donc le R² NaN, sans message. C'est ce qui
+    vidait la colonne ``r2_oos_pooling`` du panel américain (mesuré au 2026-08-29).
+    """
+    y_true, y_pred = np.asarray(y_true, dtype=float), np.asarray(y_pred, dtype=float)
+    garde = np.isfinite(y_true) & np.isfinite(y_pred)
+    if garde.sum() == 0:
+        return float("nan")
+    moyenne = np.nanmean(np.asarray(y_train, dtype=float))
+    ssr = np.sum((y_true[garde] - y_pred[garde]) ** 2)
+    sst = np.sum((y_true[garde] - moyenne) ** 2)
     return 1 - ssr / sst
 
 
