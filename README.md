@@ -10,6 +10,8 @@ rendu reproductible en 2026 : environnement figé, ligne de commande, 35 tests, 
 ![licence](https://img.shields.io/badge/code-MIT-green)
 ![rapport](https://img.shields.io/badge/m%C3%A9moire-PDF-lightgrey)
 
+Le même contenu en PDF : [rapport/rapport.pdf](rapport/rapport.pdf).
+
 **Résultat en une phrase.** Huit modèles d'apprentissage machine, nourris de centaines de variables
 macroéconomiques, tentent de prédire chaque mois les rendements de 50 actions américaines et 50 actions
 canadiennes de 2008 à 2024 ; les portefeuilles long short construits sur ces prédictions, achat des titres
