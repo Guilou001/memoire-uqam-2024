@@ -1,9 +1,12 @@
-# Prédire les rendements d'actions canadiennes et américaines avec des données macroéconomiques et l'apprentissage machine
+# Reproduire et auditer un mémoire sur la prévision des rendements d'actions
 
-Pipeline complet de mon mémoire de maîtrise, *Évaluation empirique d'actifs canadiens par l'apprentissage
-automatique* (Guillaume Vaudescal, UQAM, décembre 2024, dir. Philippe Goulet Coulombe et Dalibor Stevanovic),
-rendu reproductible en 2026 : environnement figé, ligne de commande, 35 tests, résultats et figures régénérables
-à l'identique. Le mémoire complet (PDF, 96 pages) est dans [`reports/`](reports/).
+Ce dépôt conserve le pipeline complet de mon mémoire de maîtrise remis à l'UQAM en décembre 2024. Le mémoire étudiait si des variables macroéconomiques et huit modèles d'apprentissage machine pouvaient prévoir les rendements mensuels de cinquante actions canadiennes et cinquante actions américaines. En 2026, nous avons figé l'environnement, ajouté une ligne de commande et construit des tests afin que chaque résultat puisse être reproduit.
+
+Ce travail a deux objectifs distincts. Le premier est archivistique : refaire les tableaux et les figures du mémoire sans modifier son protocole. Le second est critique : mesurer les conséquences des choix qui ne correspondent plus à une évaluation hors échantillon rigoureuse.
+
+**Résultat principal.** Dans le protocole du mémoire, le meilleur portefeuille rapporte 7,4 % par an aux États-Unis et 5,6 % au Canada, contre 10,8 % et 11,5 % pour une répartition égale. L'audit montre surtout que le signal utilisé pour former le portefeuille porte sur le mois déjà écoulé. En effet, même une connaissance parfaite de cette cible donne seulement -3,0 % par an aux États-Unis et -7,2 % au Canada. Une connaissance parfaite du mois réellement encaissé donnerait plutôt +465 % et +892 %. Le dépôt reproduit donc fidèlement le travail de 2024, mais il ne présente pas ce protocole comme une stratégie exploitable.
+
+Afin de séparer clairement ces deux lectures, nous présenterons d'abord la question du mémoire et les données utilisées. Dans un deuxième temps, nous déroulerons le pipeline historique dans son ordre d'exécution. Ensuite, nous comparerons les résultats reproduits et les contrôles ajoutés en 2026. Enfin, nous détaillerons les défauts conservés pour fidélité, les corrections appliquées dans le projet suivant et les commandes de reproduction.
 
 [![ci](https://github.com/Guilou001/04-memoire-uqam-2024/actions/workflows/ci.yml/badge.svg)](https://github.com/Guilou001/04-memoire-uqam-2024/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.12-blue)
@@ -12,14 +15,8 @@ rendu reproductible en 2026 : environnement figé, ligne de commande, 35 tests, 
 
 Le même contenu en PDF : [rapport/rapport.pdf](rapport/rapport.pdf).
 
-**Résultat en une phrase.** Huit modèles d'apprentissage machine, nourris de centaines de variables
-macroéconomiques, tentent de prédire chaque mois les rendements de 50 actions américaines et 50 actions
-canadiennes de 2008 à 2024 ; les portefeuilles long short construits sur ces prédictions, achat des titres
-les mieux classés et pari sur la baisse des moins bien classés, rapportent au mieux **7,4 % par an** aux
-États-Unis et **5,6 %** au Canada (ratios de Sharpe 0,80 et 0,39, le rendement gagné par unité de risque
-pris), tous sous un simple portefeuille équipondéré, la même somme placée sur chaque titre (10,8 et 11,5 %).
-La prédiction de rendements mensuels par la macro est un problème très difficile, et ce dépôt montre
-précisément pourquoi.
+<details>
+<summary>Résumé en anglais</summary>
 
 *English summary.* Full, reproducible pipeline of my MSc thesis: monthly returns of 50 TSX and 50 S&P 500 stocks
 predicted with Canadian (LCDMA, 410 series) and US (FRED-MD, 126 series) macro data; eight ML regressors and
@@ -31,7 +28,8 @@ feature-importance figures, pinned environment (uv), CLI, 35 tests. Limits (hype
 test period, anti-optimal trial retained for regressors, survivor universe, macro alignment) are quantified
 in section 8.
 
-## 1. La question posée
+</details>
+## 1. La question en détail
 
 Telle qu'énoncée dans l'introduction du mémoire :
 
